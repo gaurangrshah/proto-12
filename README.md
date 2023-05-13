@@ -495,6 +495,19 @@ export const env = createEnv({
 
 
 
+### Export TRPC inner context (used for testing, etc..)
+
+```tsx
+// src/server/api/trpc
+import type { inferAsyncReturnType } from '@trpc/server';
+
+export type InnerTRPCContext = inferAsyncReturnType<
+  typeof createInnerTRPCContext
+>;
+```
+
+
+
 
 
 
@@ -1206,7 +1219,466 @@ export function verificationEmail({
 
 
 
+## [Analytics](https://getanalytics.io/)
+
+```shell
+yarn add @vercel/analytics analytics analytics-plugin-do-not-track @analytics/activity-utils @analytics/cookie-utils @analytics/mixpanel
+```
+
+> ```shell
+> @analytics/google-analytics
+> ```
+
+```tsx
+// lib/analytics/plugin-do-not-track.d.ts
+
+declare module 'analytics-plugin-do-not-track' {
+  export default function doNotTrackPlugin(): void;
+}
+```
+
+### Custom Logger
+
+```tsx
+// lib/analytics/logger.ts
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export function loggerPlugin(config: { enabled: boolean }) {
+  return {
+    name: 'analytics-logger',
+    config: {
+      enabled: config.enabled,
+    },
+    initialize: () => console.log('📊 loading ALogger'),
+    loaded: () => true,
+    ready: () => console.log('📊 ready: ALogger'),
+    page: ({ payload }: { payload: Record<string, any> }) => {
+      console.log('📊 APage', payload);
+    },
+    pageEnd: ({ payload }: { payload: Record<string, any> }) => {
+      console.log('📊 APageEnd', payload);
+    },
+    /* Track event */
+    track: ({ payload }: { payload: Record<string, any> }) => {
+      console.log('📊 ATrack', payload);
+    },
+    /* Identify user */
+    identify: ({ payload }: { payload: Record<string, any> }) => {
+      delete payload?.traits?.password;
+      console.log('📊 AIdentify', payload);
+    },
+  };
+}
+```
+
+
+
+### Custom Plugin
+
+```tsx
+export function crispPlugin(userConfig: { crispId: string; enabled: boolean }) {
+  // return object for analytics to use
+  return {
+    name: 'crisp-plugin',
+    config: {
+      crispId: userConfig.crispId,
+      enabled: userConfig.enabled,
+    },
+    initialize: ({ config }: any) => {
+      // load your script here.
+      if (!config.enabled) return;
+      (<any>window).$crisp = [];
+      (<any>window).CRISP_WEBSITE_ID = config.crispId;
+      (function () {
+        const d = document;
+        // this might be causing an unterminated string literal error
+        // @SEE: https://tinyurl.com/2ocvkfvt
+
+        const s = d.createElement('script');
+        s.src = 'https://client.crisp.chat/l.js';
+        // s.async = 1;
+        s.async = true;
+        d?.getElementsByTagName('head')[0]?.appendChild(s);
+      })();
+    },
+  };
+}
+
+// usage:
+// crispPlugin({
+//   crispId: String(process.env.NEXT_PUBLIC_CRISP_WEBSITE_ID),
+//   enabled: !!process.env.NEXT_PUBLIC_CRISP_WEBSITE_ID && getConsent(),
+// }),
+
+```
+
+
+
+### Analytics Config With Consent
+
+```tsx
+// lib/analytics/consent.ts
+
+import { APP_CONSENT, isClient, isDev, isProd } from '@/utils';
+import mixpanelPlugin from '@analytics/mixpanel';
+import Analytics, { type AnalyticsInstance } from 'analytics';
+import doNotTrack from 'analytics-plugin-do-not-track';
+
+import { loggerPlugin } from './logger';
+
+// @link: https://getanalytics.io/plugins/do-not-track/
+
+// @TODO: Impelment tab events @SEE: https://getanalytics.io/plugins/tab-events/
+
+export function getConsent(): boolean {
+  if (!isClient) return false;
+  // @TTODO: extract key name to const and use in other places
+  const consent = localStorage.getItem(APP_CONSENT);
+  if (consent !== null) return JSON.parse(consent);
+  localStorage.setItem(APP_CONSENT, 'false');
+  return false;
+}
+
+const analyze = !isDev && getConsent();
+export const analytics = Analytics({
+  app: 'swatchr',
+  debug: isDev,
+  plugins: [
+    analyze
+      ? mixpanelPlugin({ // supplement with analytics of choice
+          token: process.env.NEXT_PUBLIC_MIXPANEL_TOKEN,
+          enabled: !!process.env.NEXT_PUBLIC_MIXPANEL_TOKEN,
+        })
+      : doNotTrack(),
+    loggerPlugin({ enabled: !isProd }),
+  ],
+});
+
+export type WindowWithAnalytics = Window &
+  typeof globalThis & { Analytics: AnalyticsInstance };
+if (isClient) {
+  (window as WindowWithAnalytics).Analytics = analytics;
+}
+
+/**
+ * @NOTE: FIREFOX BROWSER
+ * Firefox blocks cookies from third-party trackers by default.
+ * @SEE: https://developer.mozilla.org/en-US/docs/Web/Privacy/Storage_access_policy/Errors/CookieBlockedTracker
+ *
+ */
+```
+
+
+
+### Custom Analytics Wrapper
+
+```tsx
+// src/components/analytics/custom-analytics.tsx
+
+import { useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { getAnonId } from '@/utils';
+// import { api } from '@/utils/api';
+import { analytics } from 'lib/analytics';
+
+interface IAnalytics {
+  asPath: string;
+}
+
+/**
+ *
+ * NOTE: add server route to get ip
+ */
+export const CustomAnalytics: React.FC<IAnalytics> = ({ asPath }) => {
+  const { data: session, status } = useSession();
+  // const { data: ip } = api.server.ip.useQuery();
+  useEffect(() => {
+    analytics.page();
+  }, [asPath]);
+
+  useEffect(() => {
+    if (status === 'loading') return;
+    if (status === 'unauthenticated') {
+      const anon = getAnonId();
+      analytics.identify(
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        anon!,
+        {
+          category: 'anon',
+          label: 'anon-user',
+          value: 1,
+        },
+        // () => console.log('Identified anon user', anon, ip)
+        () => console.log('Identified anon user', anon)
+      );
+    }
+    // }, [session, status, ip]);
+  }, [session, status]);
+
+  return null;
+};
+```
+
+```tsx
+// src/pages/_app.tsx
+
+import type { NextComponentTypeWithAuth } from '@/types';
+import type { Session } from 'next-auth';
+import type { AppType } from 'next/app';
+
+import { CustomAnalytics } from '@/components/';
+import { api } from '@/utils/api';
+
+const MyApp: AppType<{ session: Session | null }> = ({
+  Component,
+  pageProps: { session, ...pageProps },
+  router,
+}) => {
+  const { auth } = Component as NextComponentTypeWithAuth;
+
+  return (
+    <>
+      {!isDev ? <CustomAnalytics asPath={router.asPath} /> : null}
+    </>
+  );
+};
+
+export default api.withTRPC(MyApp);
+```
+
+
+
+### Banner
+
+```tsx
+// src/components/analytics/banner.tsx
+
+'use client';
+
+import { useEffect, useState } from 'react';
+import type { FC, ReactNode } from 'react';
+import Link from 'next/link';
+import { APP_CONSENT, isBrowser } from '@/utils';
+import { analytics, getConsent } from 'lib/analytics';
+
+import { CookieIcon } from '@/components/icons';
+
+interface BannerProps {
+  children: ReactNode;
+  btnLabel: string;
+  consent: boolean;
+  handleConsent: () => void;
+}
+
+export const Banner: FC<BannerProps> = ({
+  children,
+  btnLabel,
+  consent,
+  handleConsent,
+}) => {
+  const [hide, setHide] = useState<boolean>(consent);
+
+  useEffect(() => {
+    if (isBrowser && !consent) document.body.style.overflow = 'hidden';
+    () => {
+      if (isBrowser) document.body.style.overflow = 'visible';
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, []);
+  }, [hide, consent]);
+
+  return !hide ? (
+    <>
+      <div className="absolute inset-0 z-[1] overflow-hidden bg-black/50 dark:bg-white/50" />
+      <div className="alert absolute bottom-6 z-[2] w-9/12 shadow-lg">
+        <div className="flex h-full w-full flex-col items-center justify-between space-y-3 md:flex-row md:space-x-2">
+          <div className="h-12 w-12">
+            <CookieIcon />
+          </div>
+          <div className="flex flex-col items-start space-x-4 md:flex-row md:items-center">
+            <div className="p-4 sm:p-0">{children}</div>
+          </div>
+          <div className="flex flex-col items-center gap-y-2 space-y-2">
+            <button
+              aria-label="accept-button"
+              className="btn-outline btn-sm btn w-36"
+              onClick={handleConsent}
+            >
+              {btnLabel}
+            </button>
+            <button
+              aria-label="accept-button"
+              className="btn-ghost btn-sm btn w-36 text-neutral-focus"
+              onClick={() => {
+                setHide(!hide);
+              }}
+            >
+              Later
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  ) : null;
+};
+
+export function Consent() {
+  'use client';
+  const [consent, setConsent] = useState<boolean>(false);
+  const [mounted, setMounted] = useState<boolean>(false);
+
+  useEffect(() => {
+    const localConsent = getConsent();
+    if (localConsent) document.body.style.overflow = 'visible';
+    setConsent(localConsent);
+    setMounted(true);
+    return () => {
+      setMounted(false);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!consent) return;
+    localStorage.setItem(APP_CONSENT, 'true');
+  }, [consent]);
+
+  const handleConsent = () => {
+    if (isBrowser) document.body.style.overflow = 'visible';
+    setConsent(true);
+    analytics.track(APP_CONSENT, {
+      category: 'consent-approval',
+      label: 'consent',
+      value: 1,
+    });
+  };
+
+  return mounted && !consent ? (
+    <Banner
+      btnLabel="I Understand"
+      handleConsent={handleConsent}
+      consent={consent}
+    >
+      <p className="text-sm font-medium leading-3 md:text-base">
+        We use cookies to personalize content and provide you with a better
+        browsing experience.
+      </p>
+      <p className="font-italic mt-1 text-xs leading-3 text-gray-500">
+        For more info visit our{' '}
+        <Link className="text-xs underline" href="/policies/privacy">
+          Privacy Policy
+        </Link>
+        . and{' '}
+        <Link className="text-xs underline" href="/policies/terms">
+          Terms and Condition
+        </Link>
+        .
+      </p>
+    </Banner>
+  ) : null;
+}
+```
+
+
+
+### Vercel Analytics
+
+```tsx
+// src/pages/_app.ts
+
+import { Analytics } from '@vercel/analytics/react';
+import { SessionProvider } from 'next-auth/react';
+import Head from 'next/head';
+
+import type { NextComponentTypeWithAuth } from '@/types';
+import type { Session } from 'next-auth';
+import type { AppType } from 'next/app';
+
+import { api } from '@/utils/api';
+
+const MyApp: AppType<{ session: Session | null }> = ({
+  Component,
+  pageProps: { session, ...pageProps },
+  router,
+}) => {
+  const { auth } = Component as NextComponentTypeWithAuth;
+
+  return (
+    <>
+      <Analytics />
+    </>
+  );
+};
+
+export default api.withTRPC(MyApp);
+```
+
+
+
 Next-Sitemap
 
+```shell
+yarn add next-sitemap
+```
+
+
+
 Next-SEO
+
+Markdown
+
+```shell
+yarn add markdown-to-jsx
+```
+
+```tsx
+// src/server/api/routers/markdown.ts
+
+import fs from 'fs';
+import path from 'path';
+import { createTRPCRouter, publicProcedure } from '@/server/api/trpc';
+import { z } from 'zod';
+
+export const markdownRouter = createTRPCRouter({
+  getFileContent: publicProcedure
+    .input(z.object({ file: z.string() }))
+    .query(({ input }) => {
+      const markdownFilePath = path.join(
+        process.cwd(),
+        'content',
+        'legal',
+        input.file + '.md'
+      );
+      const markdownFileContent = fs.readFileSync(markdownFilePath, 'utf-8');
+      return { content: markdownFileContent };
+    }),
+});
+
+```
+
+```tsx
+// src/pages/polices/disclaimer.tsx
+
+import React from 'react';
+import type { NextPage } from 'next';
+import { DefaultLayout } from '@/components';
+import Markdown from 'markdown-to-jsx';
+
+import { api } from '@/utils/api';
+
+const Disclaimer: NextPage = () => {
+  const { data } = api.markdown.getFileContent.useQuery({
+    file: 'disclaimer',
+  });
+
+  return (
+    <DefaultLayout>
+      <div className="prose-lg prose p-4">
+        <Markdown>{data?.content ?? ''}</Markdown>
+      </div>
+    </DefaultLayout>
+  );
+};
+
+export default Disclaimer;
+```
 
