@@ -3,3 +3,63 @@
 @tailwind utilities;
 @tailwind base;
 @tailwind components;
+
+@layer base {
+  :root {
+    --shdw-nums: 0, 0, 0;
+    --shdw-rgba: rgba(var(--shdw-nums), var(--shdw-opacity));
+    /* ----- unused----- */
+    --x-shdw-x: 2px;
+    --x-shdw-y: -2px;
+    --x-shdw-blur: 4px;
+    --x-shdw-spread: 0px;
+    --x-shdw: var(--x-shdw-x) var(--x-shdw-y) var(--x-shdw-blur)
+      var(--x-shdw-spread) var(--shdw-rgba);
+    /* ----- unused----- */
+  }
+
+  *:hover {
+    --shdw-opacity: 0.5;
+    --shdw-rgba: rgba(var(--shdw-nums), var(--shdw-opacity));
+  }
+  *:not(*:hover) {
+    --shdw-opacity: 0.1;
+    --shdw-rgba: rgba(var(--shdw-nums), var(--shdw-opacity));
+  }
+  /* prefers color scheme */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --shdw-nums: 255, 255, 255;
+      --shdw-rgba: rgba(var(--shdw-nums), var(--shdw-opacity));
+    }
+  }
+
+  .dark {
+    --shdw-nums: 255, 255, 255;
+    --shdw-rgba: rgba(var(--shdw-nums), var(--shdw-opacity));
+  }
+  .light {
+    --shdw-nums: 0, 0, 0;
+    --shdw-rgba: rgba(var(--shdw-nums), var(--shdw-opacity));
+  }
+}
+
+@layer components {
+  .aftr-shdw::after {
+    content: ' ';
+    display: block;
+    clear: both;
+    z-index: 1;
+    position: absolute;
+
+    width: 100%;
+    height: 100%;
+    border-radius: theme('borderRadius.md');
+    box-shadow: 2px -2px 4px rgba(var(--shdw-nums), var(--shdw-opacity)),
+      -2px 2px 4px rgba(var(--shdw-nums), var(--shdw-opacity));
+    transition: box-shadow 0.2s ease-in-out;
+  }
+  .aftr-shdw:hover::after {
+    transition: box-shadow 0.3s ease-in-out;
+  }
+}
