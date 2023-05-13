@@ -339,7 +339,46 @@ body {
 ### Google Fonts
 
 ```shell
+import { Bebas_Neue, Inter } from 'next/font/google';
 
+// #vgdy0w
+
+// If loading a variable font, you don't need to specify the font weight
+export const inter = Inter({
+  // weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+  subsets: ['latin', 'latin-ext'],
+  display: 'swap',
+  variable: '--inter-font',
+});
+
+export const bebas = Bebas_Neue({
+  weight: ['400'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--bebas-font',
+});
+```
+
+```tsx
+import {inter} from '@/utils.fonts'
+
+ <main className={`flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] ${inter.variable}`}>
+  {/*...*/}
+</main>
+```
+
+```tsx
+// tailwind.config.ts
+
+  theme: {
+    extend: {
+      fontFamily: {
+        // #vgdy0w
+        body: ['var(--inter-font)', ...fontFamily.sans],
+        dec: ['var(--bebas-font)', 'cursive'],
+      },
+    }
+  }
 ```
 
 
