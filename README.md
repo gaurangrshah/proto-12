@@ -260,7 +260,7 @@ import "@/styles/globals.css";
 }
 ```
 
-### 
+
 
 ### Default Styles
 
@@ -505,10 +505,6 @@ export type InnerTRPCContext = inferAsyncReturnType<
   typeof createInnerTRPCContext
 >;
 ```
-
-
-
-
 
 
 
