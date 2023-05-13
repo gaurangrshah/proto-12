@@ -1614,17 +1614,184 @@ export default api.withTRPC(MyApp);
 
 
 
-Next-Sitemap
+### [Next-Sitemap](https://github.com/iamvishnusankar/next-sitemap)
 
 ```shell
 yarn add next-sitemap
 ```
 
+```tsx
+// next-sitemap.config.cjs
+
+/** @type {import('next-sitemap').IConfig} */
+
+// @TODO: add postbuild script to generate a sitemap
+// @link: https://github.com/iamvishnusankar/next-sitemap
+const NextSitemapConfig = {
+  siteUrl: String(process.env?.VERCEL_URL || process.env?.NEXTAUTH_URL),
+  generateRobotsTxt: true,
+  exclude: ['/sandbox', '/_splash', '/admin/*', '/api/*'],
+};
+
+module.exports = NextSitemapConfig;
+```
+
+```json
+// package.json
+
+{
+  "scripts": {
+	  "postbuild": "next-sitemap"
+  }
+}
+```
 
 
-Next-SEO
 
-Markdown
+### [Next-SEO](https://github.com/garmeeh/next-seo)
+
+```shell
+yarn add next-seo
+```
+
+```json
+// config.json
+
+{
+  "title": "Swatchr",
+  "url": "https://swatchr.app",
+  "description": "This is the description for this #bada55 project.",
+  "keywords": "Doing all the dope things of course",
+  "twitterHandle": "@SwatchrApp",
+  "locale": "en_US",
+  "images": [
+    {
+      "url": "https://cdn.jsdelivr.net/gh/swatchr/app@main/public/swatchr-md.png",
+      "width": 960,
+      "height": 960,
+      "alt": "Swatchr Logo",
+      "type": "image/png"
+    }
+  ],
+  "additionalLinkTags": [
+    {
+      "rel": "icon",
+      "href": "https://cdn.jsdelivr.net/gh/swatchr/app@main/public/swatchr-md.png"
+    },
+    {
+      "rel": "banner",
+      "href": "https://cdn.jsdelivr.net/gh/swatchr/app@main/public/swatchr-full.png"
+    },
+    {
+      "rel": "canonical",
+      "href": "https://swatchr.app"
+    }
+  ]
+}
+```
+
+```tsx
+// utils/seo.js
+
+export function SEOConfig(
+  title: string,
+  description?: string,
+  image?: OGImage
+): SeoConfig {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { images, ...config }: Config = require('../../_data/seo.config.json');
+  const newImages =
+    image?.url && images?.[0]?.url !== image.url ? [image, ...images] : images;
+  const ogImages = newImages.map(({ url, width, height, alt, type }) => ({
+    url,
+    width,
+    height,
+    alt,
+    type,
+  }));
+
+  return {
+    title: `${title ?? config.title}`,
+    description: description ?? config.description,
+    keywords: config.keywords,
+    twitter: {
+      cardType: 'summary_large_image',
+      handle: config.twitterHandle,
+    },
+    openGraph: {
+      url: config.url,
+      title: `${title ?? config.title}`,
+      description: description ?? config.description,
+      locale: config.locale,
+      images: ogImages,
+    },
+    additionalLinkTags: config.additionalLinkTags,
+  };
+}
+
+interface SeoConfig {
+  title: string;
+  description: string | undefined;
+  keywords: string[] | undefined;
+  twitter: {
+    cardType: string;
+    handle: string | undefined;
+  };
+  openGraph: {
+    url: string | undefined;
+    title: string;
+    description: string | undefined;
+    locale: string | undefined;
+    images: OGImage[];
+  };
+  additionalLinkTags: { rel: string; href: string }[] | undefined;
+}
+
+interface Config {
+  title: string;
+  description: string | undefined;
+  keywords: string[] | undefined;
+  twitterHandle: string | undefined;
+  url: string | undefined;
+  locale: string | undefined;
+  images: OGImage[];
+  additionalLinkTags: { rel: string; href: string }[] | undefined;
+}
+
+export type OGImage = {
+  url: string;
+  width: number;
+  height: number;
+  alt: string;
+  type: string;
+};
+```
+
+```tsx
+// src/components/layouts/default.tsx
+
+import { NextSeo } from 'next-seo';
+import { SEOConfig } from '@/utils/seo';
+
+
+export const BaseLayout: React.FC<BaseLayoutProps> = ({
+  title = 'Site Title',
+  description = '',
+  image,
+  children,
+}) => {
+  
+  return (
+    <>
+    	<NextSeo {...SEOConfig(title, description, image)} />
+    </>
+  )
+}
+```
+
+
+
+### Markdown
 
 ```shell
 yarn add markdown-to-jsx
