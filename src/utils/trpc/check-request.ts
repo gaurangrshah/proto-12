@@ -1,0 +1,16 @@
+import { throwBadRequestError } from './error';
+
+/**
+ * Check if all conditions are true
+ * If not, throw a bad request error
+ *
+ * @export
+ * @param {Array<boolean>} conditions
+ */
+export function checkRequestParams(conditions: Array<boolean>): void {
+  const isAllConditionsTrue = conditions.every((condition) => !!condition);
+
+  if (!isAllConditionsTrue) {
+    throw throwBadRequestError();
+  }
+}
