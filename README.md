@@ -73,13 +73,14 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 - [x] Nodemailer
   - [x] Email wrapper
   - [x] Emails
-- [ ] Analytics
-  - [ ] Custom Logger
-  - [ ] Custom Plugin
-  - [ ] Analytics config with Consent
-  - [ ] Custom Analytics Wrapper
-  - [ ] UI: Consent Banner
-  - [ ] Vercel Analytics
+- [x] Analytics
+  - [x] Custom Logger
+  - [x] Custom Plugin
+  - [x] Analytics config with Consent
+  - [x] Custom Analytics Wrapper
+  - [x] UI: Consent Banner
+  - [x] Vercel Analytics
+  - [ ] Implement in _app.tsx
 - [ ] Markdown
 
 ----
@@ -2504,61 +2505,172 @@ export default api.withTRPC(MyApp);
 
 
 
-### Markdown
+## Markdown
 
 ```shell
 yarn add markdown-to-jsx
 ```
 
 ```tsx
-// src/server/api/routers/markdown.ts
+// src/utils/markdown/fs-markdown.ts
 
 import fs from 'fs';
 import path from 'path';
-import { createTRPCRouter, publicProcedure } from '@/server/api/trpc';
-import { z } from 'zod';
 
-export const markdownRouter = createTRPCRouter({
-  getFileContent: publicProcedure
-    .input(z.object({ file: z.string() }))
-    .query(({ input }) => {
-      const markdownFilePath = path.join(
-        process.cwd(),
-        'content',
-        'legal',
-        input.file + '.md'
-      );
-      const markdownFileContent = fs.readFileSync(markdownFilePath, 'utf-8');
-      return { content: markdownFileContent };
-    }),
-});
+/**
+ * @NOTE: can only be used in nodejs environment
+ * ensure that the fs fix is applied to next.config
 
+{
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback.fs = false;
+      config.resolve.fallback.path = false;
+    }
+    return config;
+  },
+}
+
+ * */
+
+import { ROUTES } from '../routes';
+/*
+  export const ROUTES = {
+    POLICIES: 'legal',
+    DATA: 'content',
+    META: 'seo',
+  };
+*/
+
+export function getMarkdownFileContent(dir = ROUTES.DATA, file: string) {
+  const ext = '.md';
+
+  const markdownFilePath = path.join(process.cwd(), dir, file + ext);
+
+  return new Promise((resolve, reject) => {
+    fs.access(markdownFilePath, fs.constants.F_OK, (error) => {
+      if (error) {
+        resolve({ content: '', ok: false });
+        return;
+      }
+
+      fs.readFile(markdownFilePath, 'utf8', (error, data) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        resolve({ content: data, ok: true });
+      });
+    });
+  });
+}
 ```
 
 ```tsx
-// src/pages/polices/disclaimer.tsx
+// next.config.mjs
 
-import React from 'react';
-import type { NextPage } from 'next';
-import { DefaultLayout } from '@/components';
+/** @type {import("next").NextConfig} */
+const config = {
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+  // ensure server modules resolution does not throw on the client
+      config.resolve.fallback.fs = false;
+      config.resolve.fallback.path = false;
+    }
+    return config;
+  },
+};
+```
+
+
+
+### [Tailwind CSS Typography](https://tailwindcss.com/docs/typography-plugin)
+
+```tsx
+// tailwind.config.ts
+
+import { type Config } from 'tailwindcss';
+
+export default {
+  plugins: [require('@tailwindcss/typography')],
+} satisfies Config;
+```
+
+
+
+
+
+```tsx
+// src/pages/polices/[policy].tsx
+
+import type { GetStaticPaths, GetStaticPropsContext, NextPage } from 'next';
+import { getMarkdownFileContent, getMarkdownFiles } from '@/utils';
 import Markdown from 'markdown-to-jsx';
 
-import { api } from '@/utils/api';
+import { DefaultLayout } from '@/components/_scaffold/layouts';
 
-const Disclaimer: NextPage = () => {
-  const { data } = api.markdown.getFileContent.useQuery({
-    file: 'disclaimer',
-  });
+import { ROUTES } from '@/utils/routes';
 
+const PolicyPage: NextPage<{ content: string; policy: string }> = ({
+  content,
+}) => {
   return (
     <DefaultLayout>
-      <div className="prose-lg prose p-4">
-        <Markdown>{data?.content ?? ''}</Markdown>
+      <div className="prose prose-lg p-4">
+        {content ? (
+          <Markdown options={{ wrapper: 'main' }}>{content}</Markdown>
+        ) : null}
       </div>
     </DefaultLayout>
   );
 };
 
-export default Disclaimer;
+export default PolicyPage;
+
+export async function getStaticProps(
+  context: GetStaticPropsContext<{ policy: string }>
+) {
+  const policy = context.params?.policy as string;
+  // prefetch `file.by filename`
+  const content = await getMarkdownFileContent(
+    policy,
+    `${ROUTES.DATA}/${ROUTES.POLICIES}`
+  );
+  return {
+    props: {
+      content: content.content,
+      policy,
+    },
+    revalidate: 1,
+  };
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const res = await getMarkdownFiles(`${ROUTES.DATA}/${ROUTES.POLICIES}`);
+  return {
+    paths: res.files.map((policy: string) => ({
+      params: {
+        policy: policy,
+      },
+    })),
+    // https://nextjs.org/docs/pages/api-reference/functions/get-static-paths#fallback-blocking
+    fallback: 'blocking',
+  };
+};
+```
+
+
+
+```ts
+// src/middleware.ts
+
+export { default } from 'next-auth/middleware';
+
+export const config = {
+  // matcher: ["/profile"],
+  matcher: ['/((?!register|api|login|policies).*)'], // add policies to white-listed routes
+};
+
 ```
 

@@ -130,3 +130,13 @@ export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
 export type InnerTRPCContext = inferAsyncReturnType<
   typeof createInnerTRPCContext
 >;
+
+// @TODO: figure out how to create ssrhelpers
+// @SEE https://trpc.io/docs/nextjs/ssg
+// export const ssrHelpers = createServerSideHelpers({
+//   router: appRouter,
+//   ctx: createInnerTRPCContext({
+//     session: null,
+//     req: {} as NextApiRequest,
+//   }),
+// });

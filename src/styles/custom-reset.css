@@ -43,8 +43,7 @@ body {
   -moz-osx-font-smoothing: 'grayscale';
   overflow-x: auto;
   max-width: 100vw;
-  /* color: rgb(var(--contrast-rgb));
-  background: linear-gradient(to bottom, transparent, #ffffff) #e2e2e2; */
+  /* color: rgb(var(--contrast-rgb)); */
 }
 
 #__next,
@@ -56,6 +55,15 @@ main {
   align-items: center;
   min-height: 100vh;
   width: 100vw;
+  color: white;
+  /* background: linear-gradient(to bottom, transparent, #2e026d) #15162c; */
+}
+
+.dark #__next,
+.dark #root,
+.dark main {
+  color: black;
+  /* background: linear-gradient(to bottom, transparent, #bbe112) #ffffff; */
 }
 /*
 a {
