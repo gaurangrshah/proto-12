@@ -48,9 +48,9 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] basic themeing
 - [x] Prisma
   - [x] update user model + add roles
+  - [x] add profile model
   - [x] seed script
   - [x] prisma studio
-  - [ ] add profile model
 - [x] configure trpc
   - [x] update .env.mjs
   - [x] export trpc innercontext type
@@ -758,6 +758,62 @@ model Role {
 npx prisma migrate dev --name add-pw-and-roles
 ```
 
+```
+.env
+
+NEXT_PUBLIC_ADMIN=101
+NEXT_PUBLIC_USER=2
+NEXT_PUBLIC_UNVERIFIED=1
+NEXT_PUBLIC_ANONYMOUS=0
+```
+
+```tsx
+// src/env.mjs
+
+{
+    client: {
+    NEXT_PUBLIC_ADMIN: z.string().optional(),
+    NEXT_PUBLIC_USER: z.string().optional(),
+    NEXT_PUBLIC_UNVERIFIED: z.string().optional(),
+    NEXT_PUBLIC_ANONYMOUS: z.string().optional(),
+  },
+
+  runtimeEnv: {
+    // user roles
+    NEXT_PUBLIC_ADMIN: process.env.NEXT_PUBLIC_ADMIN,
+    NEXT_PUBLIC_USER: process.env.NEXT_PUBLIC_USER,
+    NEXT_PUBLIC_UNVERIFIED: process.env.NEXT_PUBLIC_UNVERIFIED,
+    NEXT_PUBLIC_ANONYMOUS: process.env.NEXT_PUBLIC_ANONYMOUS,
+  },
+}
+```
+
+
+
+### Add Prisma Profile Model
+
+```
+model User {
+		/* ... */
+    Profile       Profile?  @relation(fields: [profileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    profileId     String?   @unique @default(cuid())
+}
+
+model Profile {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    bio       String?
+    website   String?
+    location  String?
+    User      User?
+}
+```
+
+```shell
+npx prisma migrate dev --name add-profile
+```
+
 
 
 ### Seed Script
@@ -1397,7 +1453,6 @@ export function canAccess(
 
   return (user as any)[idField] === session.user?.id;
 }
-
 ```
 
 
@@ -1412,7 +1467,7 @@ export function canAccess(
  */
 
 import * as bcrypt from 'bcryptjs';
-// export default () => console.log('boop');
+
 /**
  * Hashes a password using bcrypt
  * @param password the password to hash
@@ -1538,70 +1593,68 @@ export const providers: NextAuthOptions['providers'] = [email, google];
 // lib/next-auth/options/events
 
 import type { NextAuthOptions } from 'next-auth';
+import { prisma } from '@/server/db';
 
-// import { analytics } from '../../analytics';
-
-// import { prisma } from '@/server/db';
+import { analytics } from '../../analytics';
 
 // @link: https://next-auth.js.org/configuration/options#events
 export const events: NextAuthOptions['events'] = {
   async signIn(message) {
-    // analytics.track('auth-signIn', {
-    //   category: 'auth',
-    //   label: 'auth:signIn',
-    //   value: 1,
-    //   ...message.user,
-    //   isNewUser: message.isNewUser,
-    //   // @TODO: add emailVerified field to tracking
-    // });
-    // analytics.identify(message.user.id, {
-    //   ...message.user,
-    //   isNewUser: message.isNewUser,
-    // });
+    analytics.track('auth-signIn', {
+      category: 'auth',
+      label: 'auth:signIn',
+      value: 1,
+      ...message.user,
+      isNewUser: message.isNewUser,
+      // @TODO: add emailVerified field to tracking
+    });
+    analytics.identify(message.user.id, {
+      ...message.user,
+      isNewUser: message.isNewUser,
+    });
   },
   async signOut(message) {
-    // analytics.track('auth-signOut', {
-    //   category: 'auth',
-    //   label: 'auth:signOut',
-    //   value: 1,
-    //   ...message.session.user,
-    // });
-    // analytics.identify(message.session.user.id, {});
+    analytics.track('auth-signOut', {
+      category: 'auth',
+      label: 'auth:signOut',
+      value: 1,
+      ...message.session.user,
+    });
+    analytics.identify(message.session.user.id, {});
   },
   async createUser(message) {
-    // const user = await prisma.user.update({
-    //   where: { id: message.user.id },
-    //   data: {
-    //     Profile: { create: {} },
-    //     Role: { connect: { level: 0 } },
-    //   },
-    //   include: { Profile: true },
-    // });
-
-    // if (user && user.Profile && user.role) {
-    //   analytics.track('auth-user-create', {
-    //     category: 'auth',
-    //     label: 'user:create',
-    //     value: 1,
-    //     ...message.user,
-    //     profile: user.profileId,
-    //   });
-    //   analytics.identify(message.user.id, {
-    //     ...message.user,
-    //     profile: user.profileId,
-    //   });
-    // }
+    const user = await prisma.user.update({
+      where: { id: message.user.id },
+      data: {
+        Profile: { create: {} },
+        Role: { connect: { level: 0 } },
+      },
+      include: { Profile: true },
+    });
+    if (user && user.Profile && user.role) {
+      analytics.track('auth-user-create', {
+        category: 'auth',
+        label: 'user:create',
+        value: 1,
+        ...message.user,
+        profile: user.profileId,
+      });
+      analytics.identify(message.user.id, {
+        ...message.user,
+        profile: user.profileId,
+      });
+    }
   },
   async updateUser(message) {
-    // analytics.track('auth-user-update', {
-    //   category: 'auth',
-    //   label: 'user:update',
-    //   value: 1,
-    //   ...message.user,
-    // });
-    // analytics.identify(message.user.id, {
-    //   ...message.user,
-    // });
+    analytics.track('auth-user-update', {
+      category: 'auth',
+      label: 'user:update',
+      value: 1,
+      ...message.user,
+    });
+    analytics.identify(message.user.id, {
+      ...message.user,
+    });
   },
   async linkAccount(message) {
     delete message.account.access_token;
@@ -1611,30 +1664,30 @@ export const events: NextAuthOptions['events'] = {
     delete message.account.scope;
     delete message.account['expires_at'];
     message.account['providerAccountId'] = '*****';
-    // analytics.track('auth-link-account', {
-    //   category: 'auth',
-    //   label: 'account:link',
-    //   value: 1,
-    //   ...message.account,
-    // });
+    analytics.track('auth-link-account', {
+      category: 'auth',
+      label: 'account:link',
+      value: 1,
+      ...message.account,
+    });
     if (!message.account && !message.user.name) {
-      // analytics.track('auth-link-account-error', {
-      //   category: 'auth',
-      //   label: 'account:link:error',
-      //   value: 1,
-      // });
-      // analytics.identify(message.user.id, {
-      //   ...message.user,
-      // });
+      analytics.track('auth-link-account-error', {
+        category: 'auth',
+        label: 'account:link:error',
+        value: 1,
+      });
+      analytics.identify(message.user.id, {
+        ...message.user,
+      });
     }
   },
   async session(message) {
-    // analytics.track('auth-session', {
-    //   category: 'auth',
-    //   label: 'session',
-    //   value: 1,
-    //   ...message.session.user,
-    // });
+    analytics.track('auth-session', {
+      category: 'auth',
+      label: 'session',
+      value: 1,
+      ...message.session.user,
+    });
   },
 };
 ```
@@ -2132,7 +2185,7 @@ if (isClient) {
 ### Config With Consent + Google Tag Manager
 
 Create Google Tag manager account
-Setup universal Analytics: https://support.google.com/tagmanager/answer/6107124
+Setup GA4 + GTM: https://searchengineland.com/how-to-set-up-google-analytics-4-using-google-tag-manager-374584
 
 
 ```tsx

@@ -6,16 +6,11 @@
  * Requires user roles to be added to prisma db
  */
 
-import type { InnerTRPCContext } from '@/server/api/trpc';
-import type { User } from '@prisma/client';
-
 // import { ROLES } from 'lib/prisma/utils';
 
-const ROLES = {
-  ANON: 0,
-  USER: 1,
-  ADMIN: 101,
-};
+import type { InnerTRPCContext } from '@/server/api/trpc';
+import type { User } from '@prisma/client';
+import { ROLES } from 'lib/prisma';
 
 // /**
 //  * Returns true if the user has a role of admin
@@ -41,12 +36,12 @@ export function isSelf(
   return id === session?.user.id;
 }
 
-// export function isOwner(
-//   profileId: User['profileId'],
-//   session: InnerTRPCContext['session']
-// ): boolean {
-//   return profileId === session?.user.profileId;
-// }
+export function isOwner(
+  profileId: User['profileId'],
+  session: InnerTRPCContext['session']
+): boolean {
+  return profileId === session?.user.profileId;
+}
 
 // /**
 //  * Returns true if a user can access an object. This is a very basic check that quickly does the following:
@@ -57,14 +52,14 @@ export function isSelf(
 //  * @param ctx the context which contains the current user
 //  * @param idField the key in the object to check against
 //  */
-// export function canAccess(
-//   user: User,
-//   session: InnerTRPCContext['session'],
-//   idField = 'id' || 'userId'
-// ): boolean {
-//   if (!session?.user) return false;
-//   if (isAdmin(session.user)) return true;
-//   if (isSelf(user.id, session)) return true;
+export function canAccess(
+  user: User,
+  session: InnerTRPCContext['session'],
+  idField = 'id' || 'userId'
+): boolean {
+  if (!session?.user) return false;
+  if (isAdmin(session.user)) return true;
+  if (isSelf(user.id, session)) return true;
 
-//   return (user as any)[idField] === session.user?.id;
-// }
+  return (user as any)[idField] === session.user?.id;
+}

@@ -40,6 +40,10 @@ export const env = createEnv({
     // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
     NEXT_PUBLIC_MIXPANEL_TOKEN: z.string().min(1),
     NEXT_PUBLIC_GOOGLE_TAG_MGR_CONTAINER_ID: z.string().min(1),
+    NEXT_PUBLIC_ADMIN: z.string().optional(),
+    NEXT_PUBLIC_USER: z.string().optional(),
+    NEXT_PUBLIC_UNVERIFIED: z.string().optional(),
+    NEXT_PUBLIC_ANONYMOUS: z.string().optional(),
   },
 
   /**
@@ -49,18 +53,26 @@ export const env = createEnv({
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
+    // auth
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    // email
     ADMIN_EMAIL: process.env.ADMIN_EMAIL,
     SMTP_USER: process.env.SMTP_USER,
     SMTP_PASSWORD: process.env.SMTP_PASSWORD,
     SMTP_HOST: process.env.SMTP_HOST,
     SMTP_PORT: process.env.SMTP_PORT,
     EMAIL_FROM: process.env.EMAIL_FROM,
+    // analytics
     NEXT_PUBLIC_MIXPANEL_TOKEN: process.env.NEXT_PUBLIC_MIXPANEL_TOKEN,
     NEXT_PUBLIC_GOOGLE_TAG_MGR_CONTAINER_ID:
       process.env.NEXT_PUBLIC_GOOGLE_TAG_MGR_CONTAINER_ID,
+    // user roles
+    NEXT_PUBLIC_ADMIN: process.env.NEXT_PUBLIC_ADMIN,
+    NEXT_PUBLIC_USER: process.env.NEXT_PUBLIC_USER,
+    NEXT_PUBLIC_UNVERIFIED: process.env.NEXT_PUBLIC_UNVERIFIED,
+    NEXT_PUBLIC_ANONYMOUS: process.env.NEXT_PUBLIC_ANONYMOUS,
   },
 });
