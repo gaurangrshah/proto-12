@@ -15,9 +15,12 @@
  * These allow you to access things when processing a request, like the database, the session, etc.
  */
 
+import type { NextApiRequest } from 'next';
 import { type Session } from 'next-auth';
 import { getServerAuthSession } from '@/server/auth';
 import { prisma } from '@/server/db';
+// import { ZodError } from 'zod';
+import { formatTRPCError } from '@/utils';
 import type { inferAsyncReturnType } from '@trpc/server';
 /**
  * 2. INITIALIZATION
@@ -29,10 +32,10 @@ import type { inferAsyncReturnType } from '@trpc/server';
 import { TRPCError, initTRPC } from '@trpc/server';
 import { type CreateNextContextOptions } from '@trpc/server/adapters/next';
 import superjson from 'superjson';
-import { ZodError } from 'zod';
 
 type CreateContextOptions = {
   session: Session | null;
+  req: NextApiRequest;
 };
 
 /**
@@ -49,6 +52,7 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     prisma,
+    req: opts.req,
   };
 };
 
@@ -66,20 +70,14 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 
   return createInnerTRPCContext({
     session,
+    req,
   });
 };
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
   errorFormatter({ shape, error }) {
-    return {
-      ...shape,
-      data: {
-        ...shape.data,
-        zodError:
-          error.cause instanceof ZodError ? error.cause.flatten() : null,
-      },
-    };
+    return formatTRPCError(error, shape);
   },
 });
 

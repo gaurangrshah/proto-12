@@ -49,6 +49,12 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 - [ ] configure trpc
   - [x] update .env.mjs
   - [x] export trpc innercontext type
+  - [x] add request to trpc context
+  - [x] custom error formatter
+  - [x] api: queryclient config
+  - [x] api: custom fetch
+  - [x] api: custom headers
+  - [x] api: client error handler
 - [ ] configure next-auth
   - [ ] add test utilities
   - [ ] add user permissions helpsers (requires roles to be implemented)
@@ -840,9 +846,238 @@ export type InnerTRPCContext = inferAsyncReturnType<
 >;
 ```
 
+### Add Request To Context
+
+```tsx
+// src/server/api/trpc.ts
+import { type CreateNextContextOptions } from '@trpc/server/adapters/next';
+import { type Session } from 'next-auth';
+import type { NextApiRequest } from 'next';
+
+
+type CreateContextOptions = {
+  session: Session | null;
+  req: NextApiRequest; // add req to type
+};
+
+const createInnerTRPCContext = (opts: CreateContextOptions) => {
+  return {
+    session: opts.session,
+    prisma,
+    req: opts.req,  // add request to context
+  };
+};
+
+export const createTRPCContext = async (opts: CreateNextContextOptions) => {
+  const { req, res } = opts;
+  
+  const session = await getServerAuthSession({ req, res });
+
+  return createInnerTRPCContext({
+    session,
+    req // expose request to inner context
+  });
+};
+```
+
+
+
+#### Custom Error Formatter
+
+```tsx
+// src/utils/trpc/error.ts
+import { TRPCError } from '@trpc/server';
+import type { DefaultErrorShape } from '@trpc/server';
+
+export const formatTRPCError = (error: TRPCError, shape: DefaultErrorShape) => {
+  return {
+    ...shape,
+    data: {
+      ...shape.data,
+      zodError:
+        error.code === 'BAD_REQUEST' && error.cause instanceof ZodError
+          ? error.cause.flatten()
+          : null,
+    },
+  };
+};
+```
+
+```tsx
+// src/server/api/trpc.ts
+import { formatTRPCError } from '@/utils';
+
+const t = initTRPC.context<typeof createTRPCContext>().create({
+  transformer: superjson,
+  errorFormatter({ shape, error }) {
+    return formatTRPCError(error, shape)
+  },
+});
+```
+
+
+
+### Api Config
+
+#### Custom headers:
+
+```tsx
+// src/utils/api.ts
+
+const cacheHeaders = {
+  // @WIP:  TEST
+  // @TODO:
+  'cache-control': `s-maxage=1, stale-while-revalidate=${ONE_DAY_MS}`,
+};
+
+const getHeaders = (ctx: NextPageContext | undefined) => {
+  if (ctx?.req) {
+    const headers = ctx?.req?.headers;
+    delete headers?.connection;
+    return {
+      ...headers,
+      ...cacheHeaders,
+      'x-ssr': '1',
+    };
+  }
+  return {};
+};
+```
+
+#### QueryClient Config
+
+```tsx
+// src/utils/api.ts
+import type { inferReactQueryProcedureOptions } from '@trpc/react-query';
+
+export type ReactQueryOptions = inferReactQueryProcedureOptions<AppRouter>;
+
+const queryClientConfig = {
+  defaultOptions: {
+    queries: {
+      staleTime: DEFAULT_STALE_TIME,
+      onError: trpcClientErrorHandler, // 4QgMC
+      onSuccess: (data: unknown) => {
+        if (isDev) {
+          console.log('query client default success', data);
+        }
+      },
+    },
+    mutations: {
+      onError: trpcClientErrorHandler,
+      onSuccess: (data: unknown) => {
+        if (isDev) {
+          console.log('mutation client default success', data);
+        }
+      },
+    },
+  },
+};
+```
+
+#### Client Errors
+
+```tsx
+// src/utils/trpc/error.ts
+
+import type { AppRouter } from '@/server';
+import { TRPCClientError } from '@trpc/client';
+import { TRPCError } from '@trpc/server';
+
+export function isTRPCClientError(
+  cause: unknown
+): cause is TRPCClientError<AppRouter> {
+  return cause instanceof TRPCClientError;
+}
+
+export function trpcClientErrorHandler(cause: unknown) {
+  // 4QgMC
+  if (isTRPCClientError(cause)) {
+    const { data, message } = cause;
+    console.log('trpcClientErrorHandler', data?.code, message);
+  }
+  console.log('default error handler', cause);
+}
+```
+
+#### Config
+
+```tsx
+// src/utils/api.ts
+
+ {
+    links: [
+      loggerLink({
+        enabled: (opts) =>
+          process.env.NODE_ENV === 'development' ||
+          (opts.direction === 'down' && opts.result instanceof Error),
+      }),
+      httpBatchLink({
+        url: `${getBaseUrl()}/api/trpc`,
+        fetch(url, options) { // <- CUSTOM FETCH
+          return fetch(url, {
+            ...options,
+            credentials: 'include',
+          });
+        },
+      }),
+    ],
+    queryClientConfig, // <- Query Client Config
+    headers: getHeaders(ctx), // <- Custom headers
+ }
+```
+
 
 
 ## [NEXT-AUTH](https://next-auth.js.org/getting-started/example)
+
+### API Config:
+
+#### Update Types
+
+```tsx
+// src/server/auth.ts
+import type { User as PrismaUser } from '@prisma/client';
+import type { DefaultSession, DefaultUser } from 'next-auth';
+
+type U = Omit<PrismaUser, keyof DefaultUser>;
+declare module 'next-auth' {
+  interface User extends U {
+    emailVerified: Date | null; // adds email verified to the User interface
+  }
+  interface Session extends DefaultSession {
+    accessToken: string | unknown;
+    user: {
+      id: string;
+      // ...other properties
+      // role: UserRole; // @TODO: Add Role
+    } & DefaultUser;
+  }
+}
+```
+
+#### Zod Schema
+
+```shell
+export const authUserSchema = z.object({
+  id: z.string().nullish().optional(),
+  email: z.string().nullish().optional(),
+  image: z.string().nullish().optional(),
+  name: z.string().nullish().optional(),
+  // role: z.number().nullish().optional(),
+  // profile: z.string().nullish().optional(),
+});
+
+export const authSessionSchema = z.object({
+  accessToken: z.union([z.string(), z.unknown()]),
+  expires: z.string(),
+  user: authUserSchema,
+});
+
+export type AuthSession = z.infer<typeof authSessionSchema>;
+export type AuthUser = z.infer<typeof authUserSchema>;
+
+```
 
 
 

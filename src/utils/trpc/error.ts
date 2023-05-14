@@ -1,4 +1,4 @@
-import type { AppRouter } from '@/server';
+import type { AppRouter } from '@/server/api/root';
 import { Prisma } from '@prisma/client';
 import { TRPCClientError } from '@trpc/client';
 import type { DefaultErrorShape } from '@trpc/server';
@@ -13,6 +13,7 @@ export function isTRPCClientError(
 }
 
 export function trpcClientErrorHandler(cause: unknown) {
+  // 4QgMC
   if (isTRPCClientError(cause)) {
     const { data, message } = cause;
     console.log('trpcClientErrorHandler', data?.code, message);
