@@ -16,14 +16,20 @@ import { z } from 'zod';
 type U = Omit<PrismaUser, keyof DefaultUser>;
 declare module 'next-auth' {
   interface User extends U {
+    id: string;
+    email: string | null;
+    image: string | null;
+    name: string | null;
     emailVerified: Date | null; // adds email verified to the User interface
   }
   interface Session extends DefaultSession {
     accessToken: string | unknown;
     user: {
       id: string;
-      // ...other properties
-      // role: UserRole; // @TODO: Add Role
+      email: string | null;
+      image: string | null;
+      name: string | null;
+      role: User['role']; // @TODO: Add Role
     } & U;
   }
 }
