@@ -11,17 +11,23 @@ import type { User } from '@prisma/client';
 
 // import { ROLES } from 'lib/prisma/utils';
 
+const ROLES = {
+  ANON: 0,
+  USER: 1,
+  ADMIN: 101,
+};
+
 // /**
 //  * Returns true if the user has a role of admin
 //  * @param user The user to check the role for
 //  */
-// export const isAdmin = (user?: Partial<User> | null): boolean => {
-//   if (!user?.role) {
-//     return false;
-//   }
+export const isAdmin = (user?: Partial<User> | null): boolean => {
+  if (!user?.role) {
+    return false;
+  }
 
-//   return user.role === Number(ROLES.ADMIN);
-// };
+  return user.role === Number(ROLES.ADMIN);
+};
 
 // /**
 //  * Returns true if the passed in user is the same as the logged in user

@@ -41,15 +41,17 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] add basic middleware
   - [x] add next-sitemap
   - [x] add next-seo
-- [ ] configue tailwind
+- [x] configue tailwind
   - [x] editor intellisense config
   - [x] default styles
   - [x] google fonts (requires layout)
   - [x] basic themeing
-- [ ] Prisma
-  - [ ] add password to user model
-  - [ ] add roles
-- [ ] configure trpc
+- [x] Prisma
+  - [x] update user model + add roles
+  - [x] seed script
+  - [x] prisma studio
+  - [ ] add profile model
+- [x] configure trpc
   - [x] update .env.mjs
   - [x] export trpc innercontext type
   - [x] add request to trpc context
@@ -58,19 +60,19 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] api: custom fetch
   - [x] api: custom headers
   - [x] api: client error handler
-- [ ] configure next-auth
+- [x] configure next-auth
   - [x] Update Types
   - [x] Zod Schema
   - [x] add test utilities
-  - [ ] add user permissions helpsers (requires roles to be implemented)
+  - [x] add user permissions helpsers (requires roles to be implemented)
   - [x] add token verification helpers
   - [x] configure providers
   - [x] auth events
   - [x] auth callbacks
   - [x] client-side protected routes (AuthGate)
-- [ ] Nodemailer
-  - [ ] Email wrapper
-  - [ ] Emails
+- [x] Nodemailer
+  - [x] Email wrapper
+  - [x] Emails
 - [ ] Analytics
   - [ ] Custom Logger
   - [ ] Custom Plugin
@@ -724,6 +726,94 @@ export function ThemeToggle({ fixed = false }: { fixed?: boolean }) {
       )}
     </button>
   );
+}
+```
+
+
+
+## Prisma
+
+### Update user model
+
+```
+model User {
+		/* ,,, */ 
+    sessions      Session[]
+    password      String? // @db.Text
+    Role          Role?     @relation(fields: [role], references: [level])
+    role          Int?
+}
+
+model Role {
+    id    String @id @default(cuid())
+    type  String @unique @default("ANON")
+    level Int    @unique @default(0)
+
+    User User[]
+}
+
+```
+
+```shell
+npx prisma migrate dev --name add-pw-and-roles
+```
+
+
+
+### Seed Script
+
+```tsx
+// prisma/seed.ts
+
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
+
+const prisma = new PrismaClient();
+
+async function main() {
+  const password = await bcrypt.hash('password123', 12);
+  const user = await prisma.user.upsert({
+    where: { email: 'admin@admin.com' },
+    update: {},
+    create: {
+      email: 'admin@admin.com',
+      name: 'Admin',
+      password,
+    },
+  });
+  console.log({ user });
+}
+main()
+  .then(() => prisma.$disconnect())
+  .catch(async (e) => {
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });
+
+```
+
+```json
+// package.json
+
+{
+  "scripts": {
+    "prisma:seed": "prisma db seed"
+  }
+}
+```
+
+
+
+### Prisma Studio
+
+```json
+// package.json
+
+{
+  "scripts": {
+		"prisma:studio": "prisma studio",
+  }
 }
 ```
 
@@ -1888,16 +1978,25 @@ yarn add @vercel/analytics analytics analytics-plugin-do-not-track @analytics/ac
 ```
 
 > ```shell
-> @analytics/google-analytics
+> @analytics/google-analytics || @analytics/google-tag-manager
 > ```
 
 ```tsx
 // lib/analytics/plugin-do-not-track.d.ts
 
+declare module '@analytics/mixpanel';
+
+declare module '@analytics/cookie-utils';
+
+declare module '@analytics/activity-utils';
 declare module 'analytics-plugin-do-not-track' {
   export default function doNotTrackPlugin(): void;
 }
+
+declare module '@analytics/google-tag-manager';
 ```
+
+
 
 ### Custom Logger
 
@@ -2028,6 +2127,76 @@ if (isClient) {
  * @SEE: https://developer.mozilla.org/en-US/docs/Web/Privacy/Storage_access_policy/Errors/CookieBlockedTracker
  *
  */
+```
+
+### Config With Consent + Google Tag Manager
+
+Create Google Tag manager account
+Setup universal Analytics: https://support.google.com/tagmanager/answer/6107124
+
+
+```tsx
+// lib/analytics/consent.ts
+
+import { APP_CONSENT, isClient, isDev, isProd } from '@/utils';
+import googleTagManager from '@analytics/google-tag-manager';
+import Analytics, { type AnalyticsInstance } from 'analytics';
+import doNotTrack from 'analytics-plugin-do-not-track';
+
+import { loggerPlugin } from './logger';
+
+// @link: https://getanalytics.io/plugins/do-not-track/
+
+// @TODO: Impelment tab events @SEE: https://getanalytics.io/plugins/tab-events/
+
+export function getConsent(): boolean {
+  if (!isClient) return false;
+  // @TTODO: extract key name to const and use in other places
+  const consent = localStorage.getItem(APP_CONSENT);
+  if (consent !== null) return JSON.parse(consent);
+  localStorage.setItem(APP_CONSENT, 'false');
+  return false;
+}
+
+const analyze = !isDev && getConsent();
+export const analytics = Analytics({
+  app: 'swatchr',
+  debug: isDev,
+  plugins: [
+    analyze
+      ? googleTagManager({
+          containerId: process.env.NEXT_PUBLIC_GOOGLE_TAG_MGR_CONTAINER_ID, 
+          // @TODO: add tracking ID
+        })
+      : doNotTrack(),
+    loggerPlugin({ enabled: !isProd }),
+  ],
+});
+
+export type WindowWithAnalytics = Window &
+  typeof globalThis & { Analytics: AnalyticsInstance };
+if (isClient) {
+  (window as WindowWithAnalytics).Analytics = analytics;
+}
+```
+
+```shell
+# .env
+
+NEXT_PUBLIC_GOOGLE_TAG_MGR_CONTAINER_ID=GTM-XXXXX
+```
+
+```tsx
+// src/env.mjs
+
+client: {
+  NEXT_PUBLIC_GOOGLE_TAG_MGR_CONTAINER_ID: z.string().min(1),
+},
+  
+runtimeEnv: {
+  NEXT_PUBLIC_GOOGLE_TAG_MGR_CONTAINER_ID:
+      process.env.NEXT_PUBLIC_GOOGLE_TAG_MGR_CONTAINER_ID,
+}
 ```
 
 

@@ -1,5 +1,5 @@
 import { APP_CONSENT, isClient, isDev, isProd } from '@/utils';
-import mixpanelPlugin from '@analytics/mixpanel';
+import googleTagManager from '@analytics/google-tag-manager';
 import Analytics, { type AnalyticsInstance } from 'analytics';
 import doNotTrack from 'analytics-plugin-do-not-track';
 
@@ -24,9 +24,9 @@ export const analytics = Analytics({
   debug: isDev,
   plugins: [
     analyze
-      ? mixpanelPlugin({
-          token: process.env.NEXT_PUBLIC_MIXPANEL_TOKEN,
-          enabled: !!process.env.NEXT_PUBLIC_MIXPANEL_TOKEN,
+      ? googleTagManager({
+          containerId: process.env.NEXT_PUBLIC_GOOGLE_TAG_MGR_CONTAINER_ID,
+          // @TODO: add tracking ID
         })
       : doNotTrack(),
     loggerPlugin({ enabled: !isProd }),

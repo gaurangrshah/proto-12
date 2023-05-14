@@ -39,6 +39,7 @@ export const env = createEnv({
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
     NEXT_PUBLIC_MIXPANEL_TOKEN: z.string().min(1),
+    NEXT_PUBLIC_GOOGLE_TAG_MGR_CONTAINER_ID: z.string().min(1),
   },
 
   /**
@@ -59,5 +60,7 @@ export const env = createEnv({
     SMTP_PORT: process.env.SMTP_PORT,
     EMAIL_FROM: process.env.EMAIL_FROM,
     NEXT_PUBLIC_MIXPANEL_TOKEN: process.env.NEXT_PUBLIC_MIXPANEL_TOKEN,
+    NEXT_PUBLIC_GOOGLE_TAG_MGR_CONTAINER_ID:
+      process.env.NEXT_PUBLIC_GOOGLE_TAG_MGR_CONTAINER_ID,
   },
 });
