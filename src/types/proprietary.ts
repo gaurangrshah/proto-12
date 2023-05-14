@@ -46,3 +46,8 @@ export interface StringObj {
     [p: string]: string;
   };
 }
+
+export type Prettify<T> = {
+  // @ SEE: https://youtu.be/2lCCKiWGlC0 (Matt Pocock)
+  [K in keyof T]: T[K];
+} & Record<string, unknown>;
