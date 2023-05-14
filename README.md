@@ -29,6 +29,45 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 
 
 
+## [Checklist]
+
+- [x] Update env vars
+- [x] prime database
+- [x] update eslint-config
+- [x] add prettier
+  - [x] add prettier-sort-imports
+  - [x] add prettier-plugin-tailwindcss
+- [x] configure next.js
+  - [x] add basic middleware
+  - [x] add next-sitemap
+  - [x] add next-seo
+- [ ] configue tailwind
+  - [x] editor intellisense config
+  - [x] default styles
+  - [x] google fonts (requires layout)
+  - [x] basic themeing
+- [ ] configure trpc
+  - [x] update .env.mjs
+  - [x] export trpc innercontext type
+- [ ] configure next-auth
+  - [ ] add test utilities
+  - [ ] add user permissions helpsers (requires roles to be implemented)
+  - [ ] add token verification helpers
+  - [ ] configure providers
+  - [ ] auth events
+  - [ ] auth callbacks
+- [ ] Nodemailer
+  - [ ] Email wrapper
+  - [ ] Emails
+- [ ] Analytics
+  - [ ] Custom Logger
+  - [ ] Custom Plugin
+  - [ ] Analytics config with Consent
+  - [ ] Custom Analytics Wrapper
+  - [ ] UI: Consent Banner
+  - [ ] Vercel Analytics
+- [ ] Markdown
+
 ----
 
 ## Prerequisites
@@ -48,8 +87,6 @@ node -v > .nvmrc
 
 
 ## Sample Env
-
-
 
 ```shell
 #.env.example
@@ -196,13 +233,211 @@ module.exports = {
 
 
 
+## Next.js
+
+### Middlware
+
+```tsx
+// src/middleware.ts
+
+export { default } from 'next-auth/middleware';
+
+export const config = {
+  // matcher: ["/profile"],
+  matcher: ['/((?!register|api|login).*)'], // whitelisted routes
+};
+```
+
+
+
+### [Next-Sitemap](https://github.com/iamvishnusankar/next-sitemap)
+
+```shell
+yarn add next-sitemap
+```
+
+```tsx
+// next-sitemap.config.cjs
+
+/** @type {import('next-sitemap').IConfig} */
+
+// @TODO: add postbuild script to generate a sitemap
+// @link: https://github.com/iamvishnusankar/next-sitemap
+const NextSitemapConfig = {
+  siteUrl: String(process.env?.VERCEL_URL || process.env?.NEXTAUTH_URL),
+  generateRobotsTxt: true,
+  exclude: ['/sandbox', '/_splash', '/admin/*', '/api/*'],
+};
+
+module.exports = NextSitemapConfig;
+```
+
+```json
+// package.json
+
+{
+  "scripts": {
+	  "postbuild": "next-sitemap"
+  }
+}
+```
+
+
+
+### [Next-SEO](https://github.com/garmeeh/next-seo)
+
+```shell
+yarn add next-seo
+```
+
+```json
+// config.json
+
+{
+  "title": "Swatchr",
+  "url": "https://swatchr.app",
+  "description": "This is the description for this #bada55 project.",
+  "keywords": "Doing all the dope things of course",
+  "twitterHandle": "@SwatchrApp",
+  "locale": "en_US",
+  "images": [
+    {
+      "url": "https://cdn.jsdelivr.net/gh/swatchr/app@main/public/swatchr-md.png",
+      "width": 960,
+      "height": 960,
+      "alt": "Swatchr Logo",
+      "type": "image/png"
+    }
+  ],
+  "additionalLinkTags": [
+    {
+      "rel": "icon",
+      "href": "https://cdn.jsdelivr.net/gh/swatchr/app@main/public/swatchr-md.png"
+    },
+    {
+      "rel": "banner",
+      "href": "https://cdn.jsdelivr.net/gh/swatchr/app@main/public/swatchr-full.png"
+    },
+    {
+      "rel": "canonical",
+      "href": "https://swatchr.app"
+    }
+  ]
+}
+```
+
+```tsx
+// utils/seo.js
+
+export function SEOConfig(
+  title: string,
+  description?: string,
+  image?: OGImage
+): SeoConfig {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { images, ...config }: Config = require('../../_data/seo.config.json');
+  const newImages =
+    image?.url && images?.[0]?.url !== image.url ? [image, ...images] : images;
+  const ogImages = newImages.map(({ url, width, height, alt, type }) => ({
+    url,
+    width,
+    height,
+    alt,
+    type,
+  }));
+
+  return {
+    title: `${title ?? config.title}`,
+    description: description ?? config.description,
+    keywords: config.keywords,
+    twitter: {
+      cardType: 'summary_large_image',
+      handle: config.twitterHandle,
+    },
+    openGraph: {
+      url: config.url,
+      title: `${title ?? config.title}`,
+      description: description ?? config.description,
+      locale: config.locale,
+      images: ogImages,
+    },
+    additionalLinkTags: config.additionalLinkTags,
+  };
+}
+
+interface SeoConfig {
+  title: string;
+  description: string | undefined;
+  keywords: string[] | undefined;
+  twitter: {
+    cardType: string;
+    handle: string | undefined;
+  };
+  openGraph: {
+    url: string | undefined;
+    title: string;
+    description: string | undefined;
+    locale: string | undefined;
+    images: OGImage[];
+  };
+  additionalLinkTags: { rel: string; href: string }[] | undefined;
+}
+
+interface Config {
+  title: string;
+  description: string | undefined;
+  keywords: string[] | undefined;
+  twitterHandle: string | undefined;
+  url: string | undefined;
+  locale: string | undefined;
+  images: OGImage[];
+  additionalLinkTags: { rel: string; href: string }[] | undefined;
+}
+
+export type OGImage = {
+  url: string;
+  width: number;
+  height: number;
+  alt: string;
+  type: string;
+};
+```
+
+```tsx
+// src/components/layouts/default.tsx
+
+import { NextSeo } from 'next-seo';
+import { SEOConfig } from '@/utils/seo';
+
+
+export const BaseLayout: React.FC<BaseLayoutProps> = ({
+  title = 'Site Title',
+  description = '',
+  image,
+  children,
+}) => {
+  
+  return (
+    <>
+    	<NextSeo {...SEOConfig(title, description, image)} />
+    </>
+  )
+}
+```
+
+
+
+
+
 ## Tailwind
 
 ```shell
 yarn add -D @tailwindcss/typography
 ```
 
-
+```
+yarn add @heroicons/react
+```
 
 ```tsx
 // tailwind.config.ts
@@ -357,12 +592,13 @@ export const bebas = Bebas_Neue({
   display: 'swap',
   variable: '--bebas-font',
 });
+
 ```
 
 ```tsx
 import {inter} from '@/utils.fonts'
 
- <main className={`flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] ${inter.variable}`}>
+ <main className={`flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] ${inter.className}`}>
   {/*...*/}
 </main>
 ```
@@ -379,6 +615,104 @@ import {inter} from '@/utils.fonts'
       },
     }
   }
+```
+
+
+
+### Basic Themeing
+
+```tsx
+// hooks/use-theme-toggle.ts
+
+import { useEffect, useState } from 'react';
+import { isBrowser } from '@/utils';
+
+const getInitialTheme = (): 'light' | 'dark' => {
+  const storedTheme = '';
+  if (isBrowser) {
+    localStorage.getItem('theme');
+  }
+
+  if (storedTheme) {
+    return storedTheme === 'dark' ? 'dark' : 'light';
+  }
+  if (
+    isBrowser &&
+    window.matchMedia &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+  ) {
+    return 'dark';
+  }
+  return 'light';
+};
+
+export const useThemeToggle = (): ['light' | 'dark', () => void] => {
+  const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme);
+
+  const toggleTheme = (): void => {
+    setTheme((prevTheme) => {
+      const newTheme = prevTheme === 'light' ? 'dark' : 'light';
+      localStorage.setItem('theme', newTheme);
+      return newTheme;
+    });
+  };
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove('light', 'dark');
+    root.classList.add(theme);
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    const handleChange = (): void => {
+      setTheme((prevTheme) => {
+        const newTheme = mediaQuery.matches ? 'dark' : 'light';
+        localStorage.setItem('theme', newTheme);
+        return newTheme;
+      });
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange);
+    };
+  }, [theme]);
+
+  return [theme, toggleTheme];
+};
+```
+
+```tsx
+// src/components/ui/theme-toggle.tsx
+
+import { useEffect, useState } from 'react';
+import { useThemeToggle } from '@/hooks';
+import { MoonIcon, SunIcon } from '@heroicons/react/24/outline';
+
+export function ThemeToggle({ fixed = false }: { fixed?: boolean }) {
+  const [theme, toggleTheme] = useThemeToggle();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
+  if (!mounted) return null;
+  return (
+    <button
+      className="fixed right-10 top-10 rounded-md border-current bg-gray-950 px-2 py-1 text-white hover:bg-gray-800 active:bg-gray-950"
+      onClick={toggleTheme}
+    >
+      {theme === 'light' ? (
+        <MoonIcon className="h-5 w-5 stroke-current" strokeWidth={1} />
+      ) : (
+        <SunIcon className="h-5 w-5 stroke-current" />
+      )}
+    </button>
+  );
+}
 ```
 
 
@@ -752,7 +1086,7 @@ export function comparePasswords(
 
 
 
-## Providers
+### Providers
 
 ```tsx
 // lib/next-auth/options/providers.ts
@@ -1606,183 +1940,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
 };
 
 export default api.withTRPC(MyApp);
-```
-
-
-
-### [Next-Sitemap](https://github.com/iamvishnusankar/next-sitemap)
-
-```shell
-yarn add next-sitemap
-```
-
-```tsx
-// next-sitemap.config.cjs
-
-/** @type {import('next-sitemap').IConfig} */
-
-// @TODO: add postbuild script to generate a sitemap
-// @link: https://github.com/iamvishnusankar/next-sitemap
-const NextSitemapConfig = {
-  siteUrl: String(process.env?.VERCEL_URL || process.env?.NEXTAUTH_URL),
-  generateRobotsTxt: true,
-  exclude: ['/sandbox', '/_splash', '/admin/*', '/api/*'],
-};
-
-module.exports = NextSitemapConfig;
-```
-
-```json
-// package.json
-
-{
-  "scripts": {
-	  "postbuild": "next-sitemap"
-  }
-}
-```
-
-
-
-### [Next-SEO](https://github.com/garmeeh/next-seo)
-
-```shell
-yarn add next-seo
-```
-
-```json
-// config.json
-
-{
-  "title": "Swatchr",
-  "url": "https://swatchr.app",
-  "description": "This is the description for this #bada55 project.",
-  "keywords": "Doing all the dope things of course",
-  "twitterHandle": "@SwatchrApp",
-  "locale": "en_US",
-  "images": [
-    {
-      "url": "https://cdn.jsdelivr.net/gh/swatchr/app@main/public/swatchr-md.png",
-      "width": 960,
-      "height": 960,
-      "alt": "Swatchr Logo",
-      "type": "image/png"
-    }
-  ],
-  "additionalLinkTags": [
-    {
-      "rel": "icon",
-      "href": "https://cdn.jsdelivr.net/gh/swatchr/app@main/public/swatchr-md.png"
-    },
-    {
-      "rel": "banner",
-      "href": "https://cdn.jsdelivr.net/gh/swatchr/app@main/public/swatchr-full.png"
-    },
-    {
-      "rel": "canonical",
-      "href": "https://swatchr.app"
-    }
-  ]
-}
-```
-
-```tsx
-// utils/seo.js
-
-export function SEOConfig(
-  title: string,
-  description?: string,
-  image?: OGImage
-): SeoConfig {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { images, ...config }: Config = require('../../_data/seo.config.json');
-  const newImages =
-    image?.url && images?.[0]?.url !== image.url ? [image, ...images] : images;
-  const ogImages = newImages.map(({ url, width, height, alt, type }) => ({
-    url,
-    width,
-    height,
-    alt,
-    type,
-  }));
-
-  return {
-    title: `${title ?? config.title}`,
-    description: description ?? config.description,
-    keywords: config.keywords,
-    twitter: {
-      cardType: 'summary_large_image',
-      handle: config.twitterHandle,
-    },
-    openGraph: {
-      url: config.url,
-      title: `${title ?? config.title}`,
-      description: description ?? config.description,
-      locale: config.locale,
-      images: ogImages,
-    },
-    additionalLinkTags: config.additionalLinkTags,
-  };
-}
-
-interface SeoConfig {
-  title: string;
-  description: string | undefined;
-  keywords: string[] | undefined;
-  twitter: {
-    cardType: string;
-    handle: string | undefined;
-  };
-  openGraph: {
-    url: string | undefined;
-    title: string;
-    description: string | undefined;
-    locale: string | undefined;
-    images: OGImage[];
-  };
-  additionalLinkTags: { rel: string; href: string }[] | undefined;
-}
-
-interface Config {
-  title: string;
-  description: string | undefined;
-  keywords: string[] | undefined;
-  twitterHandle: string | undefined;
-  url: string | undefined;
-  locale: string | undefined;
-  images: OGImage[];
-  additionalLinkTags: { rel: string; href: string }[] | undefined;
-}
-
-export type OGImage = {
-  url: string;
-  width: number;
-  height: number;
-  alt: string;
-  type: string;
-};
-```
-
-```tsx
-// src/components/layouts/default.tsx
-
-import { NextSeo } from 'next-seo';
-import { SEOConfig } from '@/utils/seo';
-
-
-export const BaseLayout: React.FC<BaseLayoutProps> = ({
-  title = 'Site Title',
-  description = '',
-  image,
-  children,
-}) => {
-  
-  return (
-    <>
-    	<NextSeo {...SEOConfig(title, description, image)} />
-    </>
-  )
-}
 ```
 
 
