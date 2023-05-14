@@ -46,6 +46,9 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] default styles
   - [x] google fonts (requires layout)
   - [x] basic themeing
+- [ ] Prisma
+  - [ ] add password to user model
+  - [ ] add roles
 - [ ] configure trpc
   - [x] update .env.mjs
   - [x] export trpc innercontext type
@@ -56,12 +59,15 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] api: custom headers
   - [x] api: client error handler
 - [ ] configure next-auth
-  - [ ] add test utilities
+  - [x] Update Types
+  - [x] Zod Schema
+  - [x] add test utilities
   - [ ] add user permissions helpsers (requires roles to be implemented)
-  - [ ] add token verification helpers
-  - [ ] configure providers
-  - [ ] auth events
-  - [ ] auth callbacks
+  - [x] add token verification helpers
+  - [x] configure providers
+  - [x] auth events
+  - [x] auth callbacks
+  - [x] client-side protected routes (AuthGate)
 - [ ] Nodemailer
   - [ ] Email wrapper
   - [ ] Emails
@@ -1051,14 +1057,17 @@ declare module 'next-auth' {
       id: string;
       // ...other properties
       // role: UserRole; // @TODO: Add Role
-    } & DefaultUser;
+    } & U;
   }
 }
 ```
 
 #### Zod Schema
 
-```shell
+```tsx
+// src/server/auth.ts
+import { z } from 'zod';
+
 export const authUserSchema = z.object({
   id: z.string().nullish().optional(),
   email: z.string().nullish().optional(),
@@ -1077,6 +1086,22 @@ export const authSessionSchema = z.object({
 export type AuthSession = z.infer<typeof authSessionSchema>;
 export type AuthUser = z.infer<typeof authUserSchema>;
 
+```
+
+
+
+### Auth Options
+
+```tsx
+// src/server/auth.ts
+import { events, providers, session } from 'lib/next-auth/options';
+
+export const authOptions: NextAuthOptions = {
+  callbacks: { session },
+  adapter: PrismaAdapter(prisma),
+  providers,
+  events,
+};
 ```
 
 
@@ -1581,6 +1606,78 @@ export const callbacks = { signIn, jwt, session };
 ```
 
 
+
+### AuthGate (Protected Routes)
+
+```tsx
+// src/components/auth/auth-gate.tsx
+
+import React from 'react';
+import { useSession } from 'next-auth/react';
+
+import { Spinner } from '../ui';
+
+type AuthGateProps = {
+  // session: Session| null;
+  children: React.ReactNode;
+};
+
+export function AuthGate({ children }: AuthGateProps) {
+  const { status } = useSession({ required: true });
+
+  if (status === 'loading') {
+    return <Spinner />;
+  }
+
+  return <>{children}</>;
+}
+```
+
+
+
+```tsx
+// src/pages/_app.tsx
+
+import type { AppType } from 'next/app';
+import type { Session } from 'next-auth';
+import type { NextComponentTypeWithAuth } from '@/types';
+
+import { AuthGate } from '@/components';
+
+const MyApp: AppType<{ session: Session | null }> = ({
+  Component,
+  pageProps: { session, ...pageProps },
+  router,
+}) => {
+  const { auth } = Component as NextComponentTypeWithAuth;
+  return (
+
+    <>
+       {auth ? (
+          <AuthGate>
+            <Component {...pageProps} />
+          </AuthGate>
+        ) : (
+          <Component {...pageProps} />
+        )}
+    </>
+  );
+};
+
+export default api.withTRPC(MyApp);
+```
+
+#### Usage:
+
+```tsx
+export default function ProfilePage() {
+  return <div>ProfilePage</div>;
+}
+
+ProfilePage.auth = true;
+```
+
+> This will ensure that unauthenticated users will be redirecetd to the login page.
 
 
 
