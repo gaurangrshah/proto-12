@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+    provider        = "prisma-client-js"
     previewFeatures = ["jsonProtocol"]
 }
 
@@ -56,6 +56,17 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
+    password      String? // @db.Text
+    Role          Role?     @relation(fields: [role], references: [level])
+    role          Int?
+}
+
+model Role {
+    id    String @id @default(cuid())
+    type  String @unique @default("ANON")
+    level Int    @unique @default(0)
+
+    User User[]
 }
 
 model VerificationToken {
