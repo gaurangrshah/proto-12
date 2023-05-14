@@ -2187,6 +2187,12 @@ if (isClient) {
 Create Google Tag manager account
 Setup GA4 + GTM: https://searchengineland.com/how-to-set-up-google-analytics-4-using-google-tag-manager-374584
 
+How to configure GTM Events: https://www.bounteous.com/insights/2018/03/30/single-page-applications-google-analytics
+
+GA4 Recommended Events: https://support.google.com/analytics/answer/9267735?hl=en
+
+Event and Conversion Setup: https://searchengineland.com/google-rolling-out-conversion-migration-tool-for-google-analytics-4-383609
+
 
 ```tsx
 // lib/analytics/consent.ts
