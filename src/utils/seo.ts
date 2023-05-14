@@ -4,7 +4,11 @@ export function SEOConfig(
   image?: OGImage
 ): SeoConfig {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { images, ...config }: Config = require('../../_data/seo.config.json');
+  const {
+    images,
+    ...config
+  }: // eslint-disable-next-line @typescript-eslint/no-var-requires
+  Config = require('../../content/seo/config.json');
   const newImages =
     image?.url && images?.[0]?.url !== image.url ? [image, ...images] : images;
   const ogImages = newImages.map(({ url, width, height, alt, type }) => ({

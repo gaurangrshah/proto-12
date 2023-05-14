@@ -1,4 +1,4 @@
-export * from './use-theme';
+export * from './_use-theme';
 export * from './use-mounted';
 export * from './use-query-param';
 export * from './use-focus';
@@ -8,6 +8,6 @@ export * from './use-clipboard';
 export * from './use-disclosure';
 export * from './use-keyboard-shortcut';
 export * from './use-throttle';
-export * from './use-search-params';
 export * from './swatchr';
 export * from './use-editable-controls';
+export * from './tailwind';
