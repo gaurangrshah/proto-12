@@ -1,6 +1,6 @@
 # Alpha Usage Disclaimer
 
-> &gt; Back Home
+&gt; [Back Home](/)
 
 👋 We're thrilled to have you try out our app! We wanted to let you know that it's currently in the alpha stage and open for limited public preview. This means that while we've been hard at work the app's not quite finished yet and may still have some rough edges.
 
@@ -12,4 +12,4 @@ We want to be transparent with you about this app's state, so please keep in min
 
 By using this app, you agree to these terms and those outlined in our [terms and conditions](/policies/terms). We hope you enjoy trying out the app and look forward to hearing your thoughts!
 
-![LogoIcon](https://example.com/logo.png)
+![SwatchrLogo](https://cdn.jsdelivr.net/gh/swatchr/app@main/public/swatchr-full-transp.png)

@@ -1,5 +1,7 @@
 # Privacy Policy
 
+&gt; [Back Home](/)
+
 At Swatchr, we're committed to protecting your privacy and ensuring that you feel comfortable using our app. In this Privacy Policy, we explain how we collect, use, and protect your personal information.
 
 **What information do we collect?**
@@ -25,3 +27,5 @@ We may update this Privacy Policy from time to time, but we'll always let you kn
 **Your acceptance of these terms**
 
 By using our app, you agree to the terms of this Privacy Policy. If you don't agree with any part of this policy, please don't use our app. If you have any questions about this policy or anything else related to Swatchr, please don't hesitate to [get in touch with us](mailto:support@swatchr.app).
+
+![SwatchrLogo](https://cdn.jsdelivr.net/gh/swatchr/app@main/public/swatchr-full-transp.png)

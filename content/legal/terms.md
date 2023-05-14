@@ -1,5 +1,7 @@
 # Terms and Conditions
 
+&gt; [Back Home](/)
+
 Welcome to Swatchr! By using our web app, you agree to these Terms and Conditions, which govern your use of our app. Please read them carefully before using our app.
 
 ## Using our app
@@ -22,7 +24,5 @@ We may update these Terms and Conditions from time to time, but we'll always let
 
 By using our app, you agree to the terms of these Terms and Conditions. If you don't agree with any part of these terms, please don't use our app. If you have any questions about these terms or anything else related to Swatchr, please don't hesitate to [get in touch with us](mailto:support@swatchr.app).
 
-> &gt; Back Home
 
----
-[Swatchr Logo]
+![SwatchrLogo](https://cdn.jsdelivr.net/gh/swatchr/app@main/public/swatchr-full-transp.png)

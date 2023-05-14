@@ -6,9 +6,7 @@ import BaseLayout from './base.layout';
 export const DefaultLayout: FCwChildren<WithSEO> = ({ children, ...props }) => {
   return (
     <BaseLayout {...props}>
-      <main
-        className={`${bebas.className} font-inter flex h-screen w-full flex-col`}
-      >
+      <main className={`${bebas.className} my-6 p-6`}>
         <div className={`${inter.className}`}>{children}</div>
       </main>
     </BaseLayout>

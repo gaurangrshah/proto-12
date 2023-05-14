@@ -18,6 +18,9 @@ const config = {
     locales: ['en'],
     defaultLocale: 'en',
   },
+  images: {
+    domains: ['cdn.jsdelivr.net'],
+  },
   webpack: (config, { isServer }) => {
     if (!isServer) {
       // ensure server modules resolution does not throw on the client

@@ -1,20 +1,22 @@
+import React from 'react';
 import type { GetStaticPaths, GetStaticPropsContext, NextPage } from 'next';
-import { getMarkdownFileContent, getMarkdownFiles } from '@/utils';
+import {
+  ROUTES,
+  getMarkdownFileContent,
+  getMarkdownFiles,
+  options,
+} from '@/utils';
 import Markdown from 'markdown-to-jsx';
 
 import { DefaultLayout } from '@/components/_scaffold/layouts';
-
-import { ROUTES } from '@/utils/routes';
 
 const PolicyPage: NextPage<{ content: string; policy: string }> = ({
   content,
 }) => {
   return (
     <DefaultLayout>
-      <div className="prose prose-xl p-4">
-        {content ? (
-          <Markdown options={{ wrapper: 'main' }}>{content}</Markdown>
-        ) : null}
+      <div className="prose prose-xl">
+        {content ? <Markdown options={options}>{content}</Markdown> : null}
       </div>
     </DefaultLayout>
   );
@@ -26,7 +28,6 @@ export async function getStaticProps(
   context: GetStaticPropsContext<{ policy: string }>
 ) {
   const policy = context.params?.policy as string;
-  // prefetch `file.by filename`
   const content = await getMarkdownFileContent(
     policy,
     `${ROUTES.DATA}/${ROUTES.POLICIES}`

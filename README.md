@@ -265,6 +265,20 @@ export const config = {
 
 
 
+### Next/Image
+
+```tsx
+// next.config.ts
+
+cosnt config = {
+  images: {
+    domains: ['cdn.jsdelivr.net'],
+  }
+}
+```
+
+
+
 ### [Next-Sitemap](https://github.com/iamvishnusankar/next-sitemap)
 
 ```shell
@@ -2511,6 +2525,8 @@ export default api.withTRPC(MyApp);
 yarn add markdown-to-jsx
 ```
 
+### FS/Markdown Handlers
+
 ```tsx
 // src/utils/markdown/fs-markdown.ts
 
@@ -2567,6 +2583,10 @@ export function getMarkdownFileContent(dir = ROUTES.DATA, file: string) {
 }
 ```
 
+
+
+### Configure Webpack for Node/Client Modules
+
 ```tsx
 // next.config.mjs
 
@@ -2597,30 +2617,55 @@ export default {
 } satisfies Config;
 ```
 
+### Markdown Options
 
+```tsx
+// src/utils/markdown/options.tsx
+
+import Image from 'next/image';
+import Link from 'next/link';
+
+const overrides = {
+  a: Link,
+  img: {
+    component: (props: React.ComponentProps<'img'>) => (
+      <Image
+        src={String(props.src ?? '')}
+        width={Number(props.width ?? 200)}
+        height={Number(props.height ?? 75)}
+        alt={String(props.alt ?? '')}
+      />
+    ),
+  },
+};
+
+export const options = { overrides };
+```
 
 
 
 ```tsx
 // src/pages/polices/[policy].tsx
 
+import React from 'react';
 import type { GetStaticPaths, GetStaticPropsContext, NextPage } from 'next';
-import { getMarkdownFileContent, getMarkdownFiles } from '@/utils';
+import {
+  ROUTES,
+  getMarkdownFileContent,
+  getMarkdownFiles,
+  options,
+} from '@/utils';
 import Markdown from 'markdown-to-jsx';
 
 import { DefaultLayout } from '@/components/_scaffold/layouts';
-
-import { ROUTES } from '@/utils/routes';
 
 const PolicyPage: NextPage<{ content: string; policy: string }> = ({
   content,
 }) => {
   return (
     <DefaultLayout>
-      <div className="prose prose-lg p-4">
-        {content ? (
-          <Markdown options={{ wrapper: 'main' }}>{content}</Markdown>
-        ) : null}
+      <div className="prose prose-xl">
+        {content ? <Markdown options={options}>{content}</Markdown> : null}
       </div>
     </DefaultLayout>
   );
@@ -2632,7 +2677,6 @@ export async function getStaticProps(
   context: GetStaticPropsContext<{ policy: string }>
 ) {
   const policy = context.params?.policy as string;
-  // prefetch `file.by filename`
   const content = await getMarkdownFileContent(
     policy,
     `${ROUTES.DATA}/${ROUTES.POLICIES}`
@@ -2668,8 +2712,8 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export { default } from 'next-auth/middleware';
 
 export const config = {
-  // matcher: ["/profile"],
-  matcher: ['/((?!register|api|login|policies).*)'], // add policies to white-listed routes
+  // add policies to white-listed routes
+  matcher: ['/((?!register|api|login|policies).*)'], 
 };
 
 ```
