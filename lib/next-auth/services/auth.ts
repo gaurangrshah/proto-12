@@ -4,7 +4,6 @@
 
 import * as bcrypt from 'bcryptjs';
 
-export default () => console.log('boop');
 /**
  * Hashes a password using bcrypt
  * @param password the password to hash
