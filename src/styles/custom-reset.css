@@ -55,16 +55,18 @@ main {
   align-items: center;
   min-height: 100vh;
   width: 100vw;
-  color: white;
+  color: var(--foreground);
+  background: var(--background);
   /* background: linear-gradient(to bottom, transparent, #2e026d) #15162c; */
 }
 
 .dark #__next,
 .dark #root,
 .dark main {
-  color: black;
-  /* background: linear-gradient(to bottom, transparent, #bbe112) #ffffff; */
+  background: var(--foreground);
+  color: var(--background);
 }
+
 /*
 a {
   text-decoration: none;

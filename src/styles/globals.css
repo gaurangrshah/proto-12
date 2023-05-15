@@ -6,6 +6,15 @@
 
 @layer base {
   :root {
+    /* colors */
+    --foreground: #000;
+    --foreground-focused: #0d0d0d;
+    --foreground-muted: #6e6e6e;
+    --background: #fff;
+    --background-muted: #f5f5f5;
+    --background-focused: #f0f0f0;
+
+    /* shadows */
     --shdw-nums: 0, 0, 0;
     --shdw-rgba: rgba(var(--shdw-nums), var(--shdw-opacity));
     /* ----- unused----- */
@@ -61,5 +70,9 @@
   }
   .aftr-shdw:hover::after {
     transition: box-shadow 0.3s ease-in-out;
+  }
+
+  .prose a {
+    font-size: 0.95rem;
   }
 }
