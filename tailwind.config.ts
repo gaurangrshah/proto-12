@@ -13,7 +13,7 @@ export default {
     extend: {
       fontFamily: {
         // #vgdy0w
-        body: ['var(--bebas-font)', ...fontFamily.sans],
+        sans: ['var(--inter-font)', ...fontFamily.sans],
         dec: ['var(--bebas-font)', 'cursive'],
       },
       keyframes: {

@@ -3,9 +3,11 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { signIn, signOut, useSession } from 'next-auth/react';
 
+import { DefaultLayout } from '@/components/_scaffold/layouts';
 import { ThemeToggle } from '@/components/_scaffold/ui';
 
 import { api } from '@/utils/api';
+import { bebas, inter } from '@/utils/fonts';
 
 const Home: NextPage = () => {
   const hello = api.example.hello.useQuery({ text: 'from tRPC' });
@@ -18,20 +20,22 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <ThemeToggle />
-      <main
-        className={`flex min-h-screen flex-col items-center justify-center bg-gradient-to-b  from-[#2e026d] to-[#15162c] text-white dark:from-[#cdb9e9] dark:to-[#7d62bc] dark:text-black`}
-      >
+      <DefaultLayout>
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-          <h1 className="font-dec text-5xl font-extrabold tracking-tight dark:text-red-400 sm:text-[5rem]">
+          <h1
+            className={`font-dec text-5xl font-extrabold tracking-tight dark:text-red-400 sm:text-[5rem]`}
+          >
             Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
           </h1>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
             <Link
-              className="aftr-shdw flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 after:max-w-xs hover:bg-white/20"
+              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 after:max-w-xs hover:bg-white/20"
               href="https://create.t3.gg/en/usage/first-steps"
               target="_blank"
             >
-              <h3 className="text-2xl font-bold">First Steps →</h3>
+              <h3 className="font-dec text-2xl font-bold tracking-wider">
+                First Steps →
+              </h3>
               <div className="text-lg">
                 Just the basics - Everything you need to know to set up your
                 database and authentication.
@@ -42,7 +46,9 @@ const Home: NextPage = () => {
               href="https://create.t3.gg/en/introduction"
               target="_blank"
             >
-              <h3 className="text-2xl font-bold">Documentation →</h3>
+              <h3 className="font-dec text-2xl font-bold tracking-wider">
+                Documentation →
+              </h3>
               <div className="text-lg">
                 Learn more about Create T3 App, the libraries it uses, and how
                 to deploy it.
@@ -50,13 +56,13 @@ const Home: NextPage = () => {
             </Link>
           </div>
           <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl font-[var(--bebas-font)]">
+            <p className="text-2xl">
               {hello.data ? hello.data.greeting : 'Loading tRPC query...'}
             </p>
             <AuthShowcase />
           </div>
         </div>
-      </main>
+      </DefaultLayout>
     </>
   );
 };
@@ -73,12 +79,12 @@ const AuthShowcase: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center gap-4">
-      <p className="text-center text-2xl">
+      <p className={`text-center text-2xl`}>
         {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
         {secretMessage && <span> - {secretMessage}</span>}
       </p>
       <button
-        className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
+        className="rounded-full bg-white/10 px-10 py-3 font-dec font-semibold tracking-widest no-underline transition hover:bg-white/20"
         onClick={sessionData ? () => void signOut() : () => void signIn()}
       >
         {sessionData ? 'Sign out' : 'Sign in'}
