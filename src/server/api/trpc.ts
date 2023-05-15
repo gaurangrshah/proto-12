@@ -35,7 +35,7 @@ import superjson from 'superjson';
 
 type CreateContextOptions = {
   session: Session | null;
-  req: NextApiRequest;
+  req: NextApiRequest | null;
 };
 
 /**
@@ -52,7 +52,7 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     prisma,
-    req: opts.req,
+    req: opts?.req ?? null,
   };
 };
 
