@@ -1,25 +1,47 @@
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+
+import { createTestUser } from '../lib/prisma/utils/user';
 
 const prisma = new PrismaClient();
 
+const roles = {
+  ADMIN: 101,
+  USER: 2,
+  UNVERIFIED: 1,
+  ANON: 0,
+};
+
 async function main() {
-  const password = await bcrypt.hash('password123', 12);
-  const user = await prisma.user.upsert({
-    where: { email: 'admin@admin.com' },
+  await prisma.$transaction(
+    Object.keys(roles).map((type) => {
+      return prisma.role.upsert({
+        where: { type },
+        update: {},
+        create: {
+          type,
+          level: roles[type as keyof typeof roles],
+        },
+      });
+    })
+  );
+
+  const newUser = createTestUser({ email: 'testNew@e2e.test' });
+
+  await prisma.user.upsert({
+    where: { email: String(newUser.email) },
     update: {},
     create: {
-      email: 'admin@admin.com',
-      name: 'Admin',
-      password,
+      ...newUser,
     },
   });
-  console.log({ user });
 }
 main()
-  .then(() => prisma.$disconnect())
   .catch(async (e) => {
-    console.error(e);
+    console.error('❌ Error Seeding', e);
     await prisma.$disconnect();
     process.exit(1);
+  })
+  .finally(async () => {
+    console.log('🌱 Seeding Complete');
+    await prisma.$disconnect();
   });

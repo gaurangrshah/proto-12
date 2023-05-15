@@ -864,13 +864,21 @@ main()
 
 ```
 
+```shell
+yarn add -D ts-node
+```
+
 ```json
 // package.json
 
 {
   "scripts": {
     "prisma:seed": "prisma db seed"
-  }
+  },
+  
+  "prisma": {
+  	"seed": "ts-node prisma/seed.ts"
+	},
 }
 ```
 
@@ -884,6 +892,7 @@ main()
 {
   "scripts": {
 		"prisma:studio": "prisma studio",
+
   }
 }
 ```

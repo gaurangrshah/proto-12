@@ -77,6 +77,8 @@ model Role {
     level Int    @unique @default(0)
 
     User User[]
+
+    @@unique([type, level])
 }
 
 model Profile {
