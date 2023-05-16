@@ -5,35 +5,36 @@ import { generateRandomColor, getContrastColor } from '@/utils';
 import { CircleIcon } from './icons';
 
 export const SwatchWrapper: React.FC<{
-  color: string;
+  swatch: string;
   updateColor: (color: string) => void;
-}> = ({ color, updateColor }) => {
+}> = ({ swatch, updateColor }) => {
   const {
     ref,
     isActive,
-    controls,
     props: focusProps,
   } = useFocus({
-    onSpace: (e) => {
-      if (updateColor) {
-        updateColor(generateRandomColor());
-        e.currentTarget?.focus();
-      }
+    onSpace: () => {
+      updateColor(generateRandomColor());
     },
   });
+
+  const handleUpdateColor = (newColor: string) => {
+    updateColor(newColor);
+    ref.current?.focus();
+  };
 
   return (
     <div
       className={`flex h-auto w-full flex-1 items-center justify-center`}
       style={{
-        backgroundColor: color,
-        color: getContrastColor(color ?? '#000'),
+        backgroundColor: swatch,
+        color: getContrastColor(swatch ?? '#000'),
       }}
       ref={ref}
       // #NOTE: focused props adds: tabIndex and onKeydown + Mouse Enter/Leave
       {...focusProps}
     >
-      <Swatch color={color} updateColor={updateColor} controls={controls} />
+      <Swatch swatch={swatch} updateColor={handleUpdateColor} />
       {isActive ? (
         <div
           role="img"
@@ -47,56 +48,43 @@ export const SwatchWrapper: React.FC<{
   );
 };
 
-export const Swatch: React.FC<
-  {
-    color: string;
-    updateColor: (color: string) => void;
-    controls?: {
-      handleFocus: () => void;
-      handleBlur: () => void;
-    };
-  } & React.ComponentProps<'input'>
-> = ({ color, updateColor, controls }) => {
+export const Swatch: React.FC<{
+  swatch: string;
+  updateColor: (color: string) => void;
+}> = ({ swatch, updateColor }) => {
   const ref = useRef<HTMLDivElement>(null);
 
   const onEnter = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter') {
-      e.preventDefault(); // prevent new line in contentEditable
-      e.stopPropagation();
-      updateColor(e.currentTarget.innerText);
-      e.currentTarget?.blur();
-      controls?.handleFocus();
+      e.preventDefault();
+      updateColor(e.currentTarget.textContent || '');
+      e.currentTarget.blur();
     }
   };
 
   const onEscape = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      e.stopPropagation();
-      e.currentTarget?.blur();
-      controls?.handleFocus();
-    }
+    e.currentTarget.blur();
   };
 
   return (
-    <div className="flex h-44 w-44 items-center justify-center border">
+    <div className="flex h-44 w-44 items-center justify-center border border-current">
       <div
         ref={ref}
         aria-label="hex-input"
         role="textbox"
         contentEditable={true}
         suppressContentEditableWarning={true}
-        data-placeholder={color}
-        className={`z-[2] cursor-text text-3xl`}
+        data-placeholder={swatch}
+        className="z-[2] cursor-text text-3xl"
         onKeyDown={(e) => {
           onEnter(e);
           onEscape(e);
-          if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-            e.stopPropagation();
+          if (['ArrowLeft', 'ArrowRight'].includes(e.key)) {
+            e.preventDefault(); // #keep page from scrolling
           }
         }}
       >
-        {color}
+        {swatch}
       </div>
     </div>
   );
