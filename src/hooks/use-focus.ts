@@ -1,52 +1,69 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { isBrowser } from '@/utils';
 
 import { useKeyboardShortcut } from './use-keyboard-shortcut';
 
-interface UseFocusProps {
-  onArrowLeft?: () => void;
-  onArrowRight?: () => void;
-  onEscape?: () => void;
-  onSpace?: () => void;
-}
+type UseFocusProps = {
+  onEscape?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
+  onSpace?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
+} & React.ComponentProps<'div'>;
 
 export function useFocus(props: UseFocusProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [focused, setFocused] = useState(false);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    const active = document.activeElement;
-    const isActive = active === ref.current;
-    switch (event.key) {
-      case ' ':
-        if (!isActive) break;
-        if (props.onSpace) {
-          props.onSpace();
-        }
-        break;
-      case 'Escape':
-        if (!isActive) break;
-        if (props.onEscape) {
-          props.onEscape();
-        }
-        ref.current?.blur();
-        break;
-      default:
-        return;
+  const [isActive, setIsActive] = useState(false);
+
+  useEffect(() => {
+    if (isBrowser) {
+      ref.current?.addEventListener('focus', () => setIsActive(true));
+      ref.current?.addEventListener('blur', () => setIsActive(false));
+    }
+    const current = ref.current;
+    return () => {
+      if (isBrowser) {
+        current?.removeEventListener('focus', () => setIsActive(true));
+        current?.removeEventListener('blur', () => setIsActive(false));
+      }
+    };
+  }, []);
+
+  const handleFocus = () => {
+    if (isActive && ref.current) {
+      ref.current.focus();
+    }
+  };
+  const handleBlur = () => {
+    if (isActive && ref.current) {
+      ref.current.blur();
     }
   };
 
-  const handleFocus = () => {
-    setFocused(true);
+  const onSpace = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (isActive && e.key === ' ') {
+      e.preventDefault();
+      e.stopPropagation();
+      if (props.onSpace) props.onSpace(e);
+    }
   };
 
-  const handleBlur = () => {
-    setFocused(false);
+  const onEscape = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (isActive && e.key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      if (props.onEscape) props.onEscape(e);
+      e.currentTarget?.blur();
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    onSpace(e);
+    onEscape(e);
   };
 
   useKeyboardShortcut<HTMLDivElement>(
     ['ArrowLeft'],
     () => {
-      if (!focused) return;
+      if (!isActive) return;
       const siblingLeft = ref.current?.previousElementSibling as HTMLElement;
       siblingLeft?.focus();
     },
@@ -58,7 +75,7 @@ export function useFocus(props: UseFocusProps) {
   useKeyboardShortcut<HTMLDivElement>(
     ['ArrowRight'],
     () => {
-      if (!focused) return;
+      if (!isActive) return;
       const siblingRight = ref.current?.nextElementSibling as HTMLElement;
       siblingRight?.focus();
     },
@@ -67,14 +84,21 @@ export function useFocus(props: UseFocusProps) {
     }
   );
 
+  delete props.onEscape;
+  delete props.onSpace;
   return {
-    focused,
+    controls: {
+      handleFocus,
+      handleBlur,
+    },
+    isActive,
     ref,
     props: {
       tabIndex: 0,
       onKeyDown: handleKeyDown,
-      onFocus: handleFocus,
-      onBlur: handleBlur,
+      onMouseEnter: () => ref.current?.focus(),
+      onMouseLeave: () => ref.current?.blur(),
+      ...props,
     },
   };
 }

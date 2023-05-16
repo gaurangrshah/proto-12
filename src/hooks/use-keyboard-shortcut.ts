@@ -111,7 +111,9 @@ export const useKeyboardShortcut = <T extends HTMLElement>(
   userOptions?: UseKeyboardShortcutOptions & { ref?: React.RefObject<T> }
 ) => {
   const { ref, ...options } = { ...DEFAULT_OPTIONS, ...userOptions };
-  const targetElement = ref?.current ?? window;
+  const targetElement = ref?.current
+    ? ref.current
+    : typeof window !== 'undefined' && window;
   if (!Array.isArray(shortcutKeys))
     throw new Error(
       'The first parameter to `useKeyboardShortcut` must be an ordered array of `KeyboardEvent.key` strings.'

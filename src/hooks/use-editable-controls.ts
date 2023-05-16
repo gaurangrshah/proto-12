@@ -14,16 +14,23 @@ export function useEditableControls<T extends HTMLElement>({
     if (e.key === 'Enter') {
       e.preventDefault(); // prevent new line in contentEditable
       e.stopPropagation();
-      (ref.current as T)?.blur();
-      if (onEnter) onEnter(e);
-      // updateColor(e.currentTarget.textContent || swatch);
+      ref.current?.blur();
+      if (onEnter) {
+        onEnter(e);
+      } else {
+        console.log('onEnter not defined', ref.current, e);
+      }
     }
 
     if (e.key === 'Escape') {
       e.preventDefault();
       e.stopPropagation();
-      // ref.current?.blur();
-      if (onEscape) onEscape(e);
+      ref.current?.blur();
+      if (onEscape) {
+        onEscape(e);
+      } else {
+        console.log('onEscape not defined', ref.current, e);
+      }
     }
   }
 
