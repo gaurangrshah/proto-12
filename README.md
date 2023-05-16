@@ -609,7 +609,6 @@ import { Bebas_Neue, Inter } from 'next/font/google';
 
 // If loading a variable font, you don't need to specify the font weight
 export const inter = Inter({
-  // weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
   subsets: ['latin', 'latin-ext'],
   display: 'swap',
   variable: '--inter-font',
@@ -625,11 +624,21 @@ export const bebas = Bebas_Neue({
 ```
 
 ```tsx
-import {inter} from '@/utils.fonts'
+// components/default.layout.tsx
+import { bebas, inter } from '@/utils/fonts';
+import BaseLayout from './base.layout';
 
- <main className={`flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] ${inter.className}`}>
-  {/*...*/}
-</main>
+export const DefaultLayout: FCwChildren<WithSEO> = ({ children, ...props }) => {
+  return (
+    <BaseLayout {...props}>
+      <main
+        className={`my-6 p-6 ${inter.variable} ${bebas.variable} font-sans`}
+      >
+        {children}
+      </main>
+    </BaseLayout>
+  );
+};
 ```
 
 ```tsx
@@ -639,7 +648,7 @@ import {inter} from '@/utils.fonts'
     extend: {
       fontFamily: {
         // #vgdy0w
-        body: ['var(--inter-font)', ...fontFamily.sans],
+        sans: ['var(--inter-font)', ...fontFamily.sans],
         dec: ['var(--bebas-font)', 'cursive'],
       },
     }
