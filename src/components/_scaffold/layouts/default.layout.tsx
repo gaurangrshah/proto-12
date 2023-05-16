@@ -3,11 +3,17 @@ import type { FCwChildren, WithSEO } from '@/types';
 import { bebas, inter } from '@/utils/fonts';
 import BaseLayout from './base.layout';
 
-export const DefaultLayout: FCwChildren<WithSEO> = ({ children, ...props }) => {
+export const DefaultLayout: FCwChildren<WithSEO & { full?: boolean }> = ({
+  full,
+  children,
+  ...props
+}) => {
   return (
     <BaseLayout {...props}>
       <main
-        className={`my-6 p-6 ${inter.variable} ${bebas.variable} font-sans`}
+        className={`${full ? '' : 'my-6 p-6'} ${inter.variable} ${
+          bebas.variable
+        } font-sans`}
       >
         {children}
       </main>
