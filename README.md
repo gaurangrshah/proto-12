@@ -755,6 +755,132 @@ export function ThemeToggle({ fixed = false }: { fixed?: boolean }) {
 
 
 
+### Palette Colors
+
+```css
+@layer base {
+  :root {
+    /* colors */
+    --foreground: #333;
+    --foreground-focused: #666;
+    --foreground-muted: #999;
+    --background: #fff;
+    --background-muted: #f5f5f5;
+    --background-focused: #eaeaea;
+    --primary: #007bff;
+    --primary-focus: #0056b3;
+    --primary-muted: #b2d4f9;
+    --secondary: #6c757d;
+    --secondary-focus: #495057;
+    --secondary-muted: #c4c4c4;
+    --color-neutral: #808080;
+    --color-neutral-focus: #595959;
+    --color-neutral-muted: #bfbfbf;
+    --error: #dc3545;
+    --error-focus: #a71d2a;
+    --error-muted: #f0b2b8;
+    --success: #28a745;
+    --info: #17a2b8;
+    --warning: #ffc107;
+
+    /* shadows */
+    --shdw-nums: 0, 0, 0;
+    --shdw-rgba: rgba(var(--shdw-nums), var(--shdw-opacity));
+    /* ----- unused----- */
+    --x-shdw-x: 2px;
+    --x-shdw-y: -2px;
+    --x-shdw-blur: 4px;
+    --x-shdw-spread: 0px;
+    --x-shdw: var(--x-shdw-x) var(--x-shdw-y) var(--x-shdw-blur)
+      var(--x-shdw-spread) var(--shdw-rgba);
+    /* ----- unused----- */
+  }
+  .dark :root {
+    --foreground: #f5f5f5;
+    --foreground-focused: #ccc;
+    --foreground-muted: #999;
+    --background: #333;
+    --background-muted: #555;
+    --background-focused: #444;
+    --primary: #4d88ff;
+    --primary-focus: #0056b3;
+    --primary-muted: #163966;
+    --secondary: #b0bec5;
+    --secondary-focus: #8d9ca1;
+    --secondary-muted: #445056;
+    --color-neutral: #808080;
+    --color-neutral-focus: #a0a0a0;
+    --color-neutral-muted: #555555;
+    --error: #ff4444;
+    --error-focus: #ff0000;
+    --error-muted: #884848;
+    --success: #66cc66;
+    --success-focus: #2e8542;
+    --success-muted: #97d797;
+    --info: #4db8cc;
+    --info-focus: #378a9e;
+    --info-muted: #9cdde3;
+    --warning: #ffbb33;
+    --warning-focus: #e6a800;
+    --warning-muted: #fddc97;
+
+    --shdw-nums: 255, 255, 255;
+  }
+}
+```
+
+```tsx
+// tailwind.config.ts
+
+export default {
+  theme: {
+    extend: {
+      colors: {
+        primary: 'var(--primary)',
+        primary_focus: 'var(--primary-focus)',
+        primary_muted: 'var(--primary-muted)',
+
+        secondary: 'var(--secondary)',
+        secondary_focus: 'var(--secondary-focus)',
+        secondary_muted: 'var(--secondary-muted)',
+
+        neutral: 'var(--neutral)',
+        neutral_focus: 'var(--neutral-focus)',
+        neutral_muted: 'var(--neutral-muted)',
+
+        foreground: 'var(--foreground)',
+        foreground_focus: 'var(--foreground-focus)',
+        foreground_muted: 'var(--foreground-muted)',
+
+        background: 'var(--background)',
+        background_focus: 'var(--background-focus)',
+        background_muted: 'var(--background-muted)',
+
+        error: 'var(--error)',
+        error_focus: 'var(--error-focus)',
+        error_muted: 'var(--error-muted)',
+
+        success: 'var(--success)',
+        success_focus: 'var(--success-focus)',
+        success_muted: 'var(--success-muted)',
+
+        info: 'var(--info)',
+        info_focus: 'var(--info-focus)',
+        info_muted: 'var(--info-muted)',
+
+        warning: 'var(--warning)',
+        warning_focus: 'var(--warning-focus)',
+        warning_muted: 'var(--warning-muted)',
+      },
+    }
+  }
+}
+```
+
+
+
+
+
 ## Prisma
 
 ### Update user model

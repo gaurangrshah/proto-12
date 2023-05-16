@@ -60,6 +60,43 @@ export default {
         thinDark:
           '2px -2px 4px rgba(0,0,0, 0.5), -2px 2px 4px rgba(0,0,0, 0.5)',
       },
+      colors: {
+        primary: 'var(--primary)',
+        primary_focus: 'var(--primary-focus)',
+        primary_muted: 'var(--primary-muted)',
+
+        secondary: 'var(--secondary)',
+        secondary_focus: 'var(--secondary-focus)',
+        secondary_muted: 'var(--secondary-muted)',
+
+        neutral: 'var(--neutral)',
+        neutral_focus: 'var(--neutral-focus)',
+        neutral_muted: 'var(--neutral-muted)',
+
+        foreground: 'var(--foreground)',
+        foreground_focus: 'var(--foreground-focus)',
+        foreground_muted: 'var(--foreground-muted)',
+
+        background: 'var(--background)',
+        background_focus: 'var(--background-focus)',
+        background_muted: 'var(--background-muted)',
+
+        error: 'var(--error)',
+        error_focus: 'var(--error-focus)',
+        error_muted: 'var(--error-muted)',
+
+        success: 'var(--success)',
+        success_focus: 'var(--success-focus)',
+        success_muted: 'var(--success-muted)',
+
+        info: 'var(--info)',
+        info_focus: 'var(--info-focus)',
+        info_muted: 'var(--info-muted)',
+
+        warning: 'var(--warning)',
+        warning_focus: 'var(--warning-focus)',
+        warning_muted: 'var(--warning-muted)',
+      },
     },
   },
   plugins: [require('@tailwindcss/typography')],

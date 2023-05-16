@@ -7,12 +7,27 @@
 @layer base {
   :root {
     /* colors */
-    --foreground: #000;
-    --foreground-focused: #0d0d0d;
-    --foreground-muted: #6e6e6e;
+    --foreground: #333;
+    --foreground-focused: #666;
+    --foreground-muted: #999;
     --background: #fff;
     --background-muted: #f5f5f5;
-    --background-focused: #f0f0f0;
+    --background-focused: #eaeaea;
+    --primary: #007bff;
+    --primary-focus: #0056b3;
+    --primary-muted: #b2d4f9;
+    --secondary: #6c757d;
+    --secondary-focus: #495057;
+    --secondary-muted: #c4c4c4;
+    --color-neutral: #808080;
+    --color-neutral-focus: #595959;
+    --color-neutral-muted: #bfbfbf;
+    --error: #dc3545;
+    --error-focus: #a71d2a;
+    --error-muted: #f0b2b8;
+    --success: #28a745;
+    --info: #17a2b8;
+    --warning: #ffc107;
 
     /* shadows */
     --shdw-nums: 0, 0, 0;
@@ -25,6 +40,38 @@
     --x-shdw: var(--x-shdw-x) var(--x-shdw-y) var(--x-shdw-blur)
       var(--x-shdw-spread) var(--shdw-rgba);
     /* ----- unused----- */
+  }
+
+  .dark :root {
+    --foreground: #f5f5f5;
+    --foreground-focused: #ccc;
+    --foreground-muted: #999;
+    --background: #333;
+    --background-muted: #555;
+    --background-focused: #444;
+    --primary: #4d88ff;
+    --primary-focus: #0056b3;
+    --primary-muted: #163966;
+    --secondary: #b0bec5;
+    --secondary-focus: #8d9ca1;
+    --secondary-muted: #445056;
+    --color-neutral: #808080;
+    --color-neutral-focus: #a0a0a0;
+    --color-neutral-muted: #555555;
+    --error: #ff4444;
+    --error-focus: #ff0000;
+    --error-muted: #884848;
+    --success: #66cc66;
+    --success-focus: #2e8542;
+    --success-muted: #97d797;
+    --info: #4db8cc;
+    --info-focus: #378a9e;
+    --info-muted: #9cdde3;
+    --warning: #ffbb33;
+    --warning-focus: #e6a800;
+    --warning-muted: #fddc97;
+
+    --shdw-nums: 255, 255, 255;
   }
 
   *:hover {
@@ -74,5 +121,101 @@
 
   .prose a {
     font-size: 0.95rem;
+  }
+
+  /* Base button styles */
+  .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 4px;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  /* Hover state */
+  .btn:hover {
+    background-color: #0056b3;
+  }
+
+  /* Active state */
+  .btn:active {
+    background-color: #003d80;
+    transform: translateY(1px);
+  }
+
+  /* Focus state */
+  .btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+  }
+
+  /* Disabled state */
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* Ghost style */
+  .btn-ghost {
+    background-color: transparent;
+    border: 1px solid #007bff;
+  }
+
+  .btn-ghost:hover {
+    background-color: #007bff;
+    color: #ffffff;
+  }
+
+  .btn-ghost:active {
+    background-color: #003d80;
+    border-color: #003d80;
+    transform: translateY(1px);
+  }
+
+  /* Outline style */
+  .btn-outline {
+    background-color: transparent;
+    border: 1px solid #007bff;
+    color: #007bff;
+  }
+
+  .btn-outline:hover {
+    background-color: #007bff;
+    color: #ffffff;
+  }
+
+  .btn-outline:active {
+    background-color: #003d80;
+    border-color: #003d80;
+    transform: translateY(1px);
+  }
+
+  /* Round style */
+  .btn-round {
+    border-radius: 50px;
+  }
+
+  .btn-round:active {
+    transform: translateY(1px);
+  }
+
+  /* Solid style */
+  .btn-solid {
+    background-color: #007bff;
+  }
+
+  .btn-solid:hover {
+    background-color: #0056b3;
+  }
+
+  .btn-solid:active {
+    background-color: #003d80;
+    transform: translateY(1px);
   }
 }
