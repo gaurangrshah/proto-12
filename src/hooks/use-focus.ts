@@ -1,91 +1,117 @@
 import { useEffect, useRef, useState } from 'react';
-import { isBrowser } from '@/utils';
 
 import { useKeyboardShortcut } from './use-keyboard-shortcut';
 
 type UseFocusProps = {
   onEscape?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
-  onSpace?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
+  onSpace?: () => void;
 } & React.ComponentProps<'div'>;
 
 export function useFocus(props: UseFocusProps) {
   const ref = useRef<HTMLDivElement>(null);
-
   const [isActive, setIsActive] = useState(false);
 
   useEffect(() => {
-    if (isBrowser) {
-      ref.current?.addEventListener('focus', () => setIsActive(true));
-      ref.current?.addEventListener('blur', () => setIsActive(false));
-    }
+    const handleFocus = () => {
+      setIsActive(true);
+    };
+
+    const handleBlur = () => {
+      setIsActive(false);
+    };
+
     const current = ref.current;
+
+    if (current) {
+      current.addEventListener('focus', handleFocus);
+      current.addEventListener('blur', handleBlur);
+    }
+
     return () => {
-      if (isBrowser) {
-        current?.removeEventListener('focus', () => setIsActive(true));
-        current?.removeEventListener('blur', () => setIsActive(false));
+      if (current) {
+        current.removeEventListener('focus', handleFocus);
+        current.removeEventListener('blur', handleBlur);
       }
     };
   }, []);
 
   const handleFocus = () => {
-    if (isActive && ref.current) {
-      ref.current.focus();
-    }
-  };
-  const handleBlur = () => {
-    if (isActive && ref.current) {
-      ref.current.blur();
-    }
+    ref.current?.focus();
   };
 
-  const onSpace = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (isActive && e.key === ' ') {
-      e.preventDefault();
-      e.stopPropagation();
-      if (props.onSpace) props.onSpace(e);
-    }
+  const handleBlur = () => {
+    ref.current?.blur();
   };
 
   const onEscape = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (isActive && e.key === 'Escape') {
+    if (isActive && e.key === 'Escape' && props.onEscape) {
       e.preventDefault();
       e.stopPropagation();
-      if (props.onEscape) props.onEscape(e);
-      e.currentTarget?.blur();
+      props.onEscape(e);
+      e.currentTarget.blur();
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    onSpace(e);
     onEscape(e);
   };
 
-  useKeyboardShortcut<HTMLDivElement>(
+  useKeyboardShortcut<HTMLElement>(
     ['ArrowLeft'],
     () => {
       if (!isActive) return;
-      const siblingLeft = ref.current?.previousElementSibling as HTMLElement;
+      const siblingLeft = ref.current
+        ?.previousElementSibling as HTMLElement | null;
       siblingLeft?.focus();
     },
-    {
-      ref: ref,
-    }
+    { ref }
   );
 
-  useKeyboardShortcut<HTMLDivElement>(
+  useKeyboardShortcut<HTMLElement>(
     ['ArrowRight'],
     () => {
       if (!isActive) return;
-      const siblingRight = ref.current?.nextElementSibling as HTMLElement;
+      const siblingRight = ref.current
+        ?.nextElementSibling as HTMLElement | null;
       siblingRight?.focus();
     },
-    {
-      ref: ref,
-    }
+    { ref }
+  );
+  useKeyboardShortcut<HTMLElement>(
+    ['ArrowUp'],
+    () => {
+      if (!isActive) return;
+      const siblingLeft = ref.current
+        ?.previousElementSibling as HTMLElement | null;
+      siblingLeft?.focus();
+    },
+    { ref }
   );
 
-  delete props.onEscape;
-  delete props.onSpace;
+  useKeyboardShortcut<HTMLElement>(
+    ['ArrowDown'],
+    () => {
+      if (!isActive) return;
+      const siblingRight = ref.current
+        ?.nextElementSibling as HTMLElement | null;
+      siblingRight?.focus();
+    },
+    { ref }
+  );
+
+  useKeyboardShortcut(
+    [' '],
+    () => {
+      if (!isActive) return;
+      props.onSpace?.();
+      ref.current?.focus();
+    },
+    { ref }
+  );
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { onEscape: _, onSpace: __, ...otherProps } = props; // destrcut for otherProps
+
   return {
     controls: {
       handleFocus,
@@ -98,7 +124,7 @@ export function useFocus(props: UseFocusProps) {
       onKeyDown: handleKeyDown,
       onMouseEnter: () => ref.current?.focus(),
       onMouseLeave: () => ref.current?.blur(),
-      ...props,
+      ...otherProps,
     },
   };
 }
