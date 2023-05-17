@@ -10,33 +10,31 @@ export function getContrastColor(hexColor: string) {
   );
 
   // If the contrast ratio between the input color and mid-gray is less than 4.5,
-  // calculate the contrast ratio between the input color and white
+  // calculate the contrast ratio between the input color and each gray shade in TailwindColors
   if (
     parseFloat(calculateContrastRatio(hexColor, textColor.toHexString())) < 4.5
   ) {
-    // textColor = tinycolor.mostReadable(hexColor, ['#ffffff']);
-    textColor = tinycolor.mostReadable(
-      hexColor,
-      Object.values(TailwindColors).flatMap((color) => Object.values(color))
-    );
+    const grayShades = Object.values(TailwindColors.gray);
+    const compliantGrays = grayShades.filter((gray) => {
+      return parseFloat(calculateContrastRatio(hexColor, gray)) >= 4.5;
+    });
+
+    if (compliantGrays.length > 0) {
+      textColor = tinycolor.mostReadable(hexColor, compliantGrays);
+    } else {
+      // If no compliant grays are available, select the color with the highest contrast
+      const contrastRatios = grayShades.map((gray) => {
+        return parseFloat(calculateContrastRatio(hexColor, gray));
+      });
+
+      const maxContrastIndex = contrastRatios.indexOf(
+        Math.max(...contrastRatios)
+      );
+      textColor = tinycolor(grayShades[maxContrastIndex]);
+    }
   }
 
-  // Choose the text color with higher contrast
-  const contrastWithBlack = parseFloat(
-    calculateContrastRatio(hexColor, '#000000')
-  );
-  const contrastWithWhite = parseFloat(
-    calculateContrastRatio(hexColor, '#ffffff')
-  );
-
-  let contrastColor;
-  if (contrastWithWhite > contrastWithBlack) {
-    contrastColor = '#ffffff';
-  } else {
-    contrastColor = '#000000';
-  }
-
-  return contrastColor;
+  return textColor.toHexString();
 }
 
 export const TailwindColors = {
