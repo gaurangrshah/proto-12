@@ -10,5 +10,8 @@
   },
   "editor.quickSuggestions": {
     "strings": true // shows suggestions with strings as well
-  }
+  },
+  "cSpell.words": [
+    "headlessui"
+  ]
 }
