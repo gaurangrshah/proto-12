@@ -1,4 +1,4 @@
-import { type Config } from 'tailwindcss';
+import type { Config } from 'tailwindcss';
 import { fontFamily } from 'tailwindcss/defaultTheme';
 
 export default {
@@ -61,41 +61,33 @@ export default {
           '2px -2px 4px rgba(0,0,0, 0.5), -2px 2px 4px rgba(0,0,0, 0.5)',
       },
       colors: {
-        primary: 'var(--primary)',
-        primary_focus: 'var(--primary-focus)',
-        primary_muted: 'var(--primary-muted)',
-
-        secondary: 'var(--secondary)',
-        secondary_focus: 'var(--secondary-focus)',
-        secondary_muted: 'var(--secondary-muted)',
-
-        neutral: 'var(--neutral)',
-        neutral_focus: 'var(--neutral-focus)',
-        neutral_muted: 'var(--neutral-muted)',
-
-        foreground: 'var(--foreground)',
-        foreground_focus: 'var(--foreground-focus)',
-        foreground_muted: 'var(--foreground-muted)',
-
-        background: 'var(--background)',
-        background_focus: 'var(--background-focus)',
-        background_muted: 'var(--background-muted)',
-
-        error: 'var(--error)',
-        error_focus: 'var(--error-focus)',
-        error_muted: 'var(--error-muted)',
-
-        success: 'var(--success)',
-        success_focus: 'var(--success-focus)',
-        success_muted: 'var(--success-muted)',
-
-        info: 'var(--info)',
-        info_focus: 'var(--info-focus)',
-        info_muted: 'var(--info-muted)',
-
-        warning: 'var(--warning)',
-        warning_focus: 'var(--warning-focus)',
-        warning_muted: 'var(--warning-muted)',
+        foreground: 'rgb(var(--rgb-foreground) / <alpha-value>)',
+        foreground_focused: 'rgb(var(--rgb-foreground-focused)/ <alpha-value>)',
+        foreground_muted: 'rgb(var(--rgb-foreground-muted) / <alpha-value>)',
+        background: 'rgb(var(--rgb-background) / <alpha-value>)',
+        background_focused: 'rgb(var(--rgb-background-focused)/ <alpha-value>)',
+        background_muted: 'rgb(var(--rgb-background-muted) / <alpha-value>)',
+        primary: 'rgb(var(--rgb-primary) / <alpha-value>)',
+        primary_focused: 'rgb(var(--rgb-primary-focused)/ <alpha-value>)',
+        primary_muted: 'rgb(var(--rgb-primary-muted) / <alpha-value>)',
+        secondary: 'rgb(var(--rgb-secondary) / <alpha-value>)',
+        secondary_focused: 'rgb(var(--rgb-secondary-focused)/ <alpha-value>)',
+        secondary_muted: 'rgb(var(--rgb-secondary-muted) / <alpha-value>)',
+        neutral: 'rgb(var(--rgb-neutral) / <alpha-value>)',
+        neutral_focused: 'rgb(var(--rgb-neutral-focused)/ <alpha-value>)',
+        neutral_muted: 'rgb(var(--rgb-neutral-muted) / <alpha-value>)',
+        error: 'rgb(var(--rgb-error) / <alpha-value>)',
+        error_focused: 'rgb(var(--rgb-error-focused)/ <alpha-value>)',
+        error_muted: 'rgb(var(--rgb-error-muted) / <alpha-value>)',
+        success: 'rgb(var(--rgb-success) / <alpha-value>)',
+        success_focused: 'rgb(var(--rgb-success-focused)/ <alpha-value>)',
+        success_muted: 'rgb(var(--rgb-success-muted) / <alpha-value>)',
+        info: 'rgb(var(--rgb-info) / <alpha-value>)',
+        info_focused: 'rgb(var(--rgb-info-focused)/ <alpha-value>)',
+        info_muted: 'rgb(var(--rgb-info-muted) / <alpha-value>)',
+        warning: 'rgb(var(--rgb-warning) / <alpha-value>)',
+        warning_focused: 'rgb(var(--rgb-warning-focused)/ <alpha-value>)',
+        warning_muted: 'rgb(var(--rgb-warning-muted) / <alpha-value>)',
       },
     },
   },

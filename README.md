@@ -753,6 +753,73 @@ export function ThemeToggle({ fixed = false }: { fixed?: boolean }) {
 }
 ```
 
+> **Using next-themes**
+>
+> ```tsx
+> // src/components/ui/theme-toggle.tsx
+> 
+> import { useEffect, useState } from 'react';
+> import { MoonIcon, SunIcon } from '@heroicons/react/24/outline';
+> import { useTheme } from 'next-themes';
+> 
+> export function ThemeToggle() {
+>   const [mounted, setMounted] = useState(false);
+> 
+>   const { theme, setTheme, systemTheme } = useTheme();
+>   const currentTheme = theme === 'system' ? systemTheme : theme;
+> 
+>   useEffect(() => {
+>     setMounted(true);
+>     return () => setMounted(false);
+>   }, []);
+> 
+>   if (!mounted) return null;
+> 
+>   return (
+>     <button
+>       className="fixed right-10 top-10 rounded-md border-current bg-gray-950 p-2 text-white hover:bg-gray-800 active:bg-gray-950"
+>       onClick={() =>
+>         currentTheme == 'dark' ? setTheme('light') : setTheme('dark')
+>       }
+>     >
+>       {theme === 'light' ? (
+>         <MoonIcon className="h-5 w-5 stroke-current" strokeWidth={1} />
+>       ) : (
+>         <SunIcon className="h-5 w-5 stroke-current" />
+>       )}
+>     </button>
+>   );
+> }
+> ```
+>
+> 
+>
+> ```tsx
+> // src/pags/_app.tsx
+> 
+> import type { FCwChildren, WithSEO } from '@/types';
+> import { SEOConfig } from '@/utils';
+> import { NextSeo } from 'next-seo';
+> import { ThemeProvider } from 'next-themes';
+> 
+> import { ThemeToggle } from '../ui/theme-toggle';
+> 
+> const BaseLayout: FCwChildren<WithSEO> = ({ title, description, children }) => {
+>   return (
+>     <ThemeProvider
+>       attribute="class"
+>     >
+>       <NextSeo {...SEOConfig} title={title} description={description} />
+>       <ThemeToggle />
+>       {children}
+>     </ThemeProvider>
+>   );
+> };
+> 
+> export default BaseLayout;
+> 
+> ```
+
 
 
 ### Palette Colors
@@ -760,32 +827,63 @@ export function ThemeToggle({ fixed = false }: { fixed?: boolean }) {
 ```css
 @layer base {
   :root {
-    /* colors */
-    --foreground: #333;
-    --foreground-focused: #666;
-    --foreground-muted: #999;
-    --background: #fff;
-    --background-muted: #f5f5f5;
-    --background-focused: #eaeaea;
-    --primary: #007bff;
-    --primary-focus: #0056b3;
-    --primary-muted: #b2d4f9;
-    --secondary: #6c757d;
-    --secondary-focus: #495057;
-    --secondary-muted: #c4c4c4;
-    --color-neutral: #808080;
-    --color-neutral-focus: #595959;
-    --color-neutral-muted: #bfbfbf;
-    --error: #dc3545;
-    --error-focus: #a71d2a;
-    --error-muted: #f0b2b8;
-    --success: #28a745;
-    --info: #17a2b8;
-    --warning: #ffc107;
+    /* light */
+    /* #000 */
+    --rgb-foreground: 0 0 0;
+    /* #777 */
+    --rgb-foreground-focused: 119 119 119;
+    /* #999 */
+    --rgb-foreground-muted: 153 153 153;
+    /* #f5f5f5 */
+    --rgb-background: 245 245 245;
+    /* #ddd */
+    --rgb-background-muted: 221 221 221;
+    /* #eee */
+    --rgb-background-focused: 238 238 238;
+    /* #00d5d5 */
+    --rgb-primary: 0 213 213;
+    /* #0080cc */
+    --rgb-primary-focused: 0 128 204;
+    /* #154d66 */
+    --rgb-primary-muted: 21 77 102;
+    /* #546e78 */
+    --rgb-secondary: 84 110 120;
+    /* #39484d */
+    --rgb-secondary-focused: 57 72 77;
+    /* #a2a9ad */
+    --rgb-secondary-muted: 162 169 173;
+    /* #9f9f9f */
+    --rgb-neutral: 159 159 159;
+    /* #7f7f7f */
+    --rgb-neutral-focused: 127 127 127;
+    /* #aaaaaa */
+    --rgb-neutral-muted: 170 170 170;
+    /* #ff6666 */
+    --rgb-error: 255 102 102;
+    /* #ff0000 */
+    --rgb-error-focused: 255 0 0;
+    /* #883333 */
+    --rgb-error-muted: 136 51 51;
+    /* #66cc66 */
+    --rgb-success: 102 204 102;
+    /* #2e8542 */
+    --rgb-success-focused: 46 133 66;
+    /* #97d797 */
+    --rgb-success-muted: 151 215 151;
+    /* #66a6cc */
+    --rgb-info: 102 166 204;
+    /* #3a6b8a */
+    --rgb-info-focused: 58 107 138;
+    /* #92c2e3 */
+    --rgb-info-muted: 146 194 227;
+    /* #ffc04d */
+    --rgb-warning: 255 192 77;
+    /* #e69d00 */
+    --rgb-warning-focused: 230 157 0;
+    /* #fdc97f */
+    --rgb-warning-muted: 253 201 127;
 
-    /* shadows */
-    --shdw-nums: 0, 0, 0;
-    --shdw-rgba: rgba(var(--shdw-nums), var(--shdw-opacity));
+    --shdw-nums: 255, 255, 255;
     /* ----- unused----- */
     --x-shdw-x: 2px;
     --x-shdw-y: -2px;
@@ -795,37 +893,64 @@ export function ThemeToggle({ fixed = false }: { fixed?: boolean }) {
       var(--x-shdw-spread) var(--shdw-rgba);
     /* ----- unused----- */
   }
-  .dark :root {
-    --foreground: #f5f5f5;
-    --foreground-focused: #ccc;
-    --foreground-muted: #999;
-    --background: #333;
-    --background-muted: #555;
-    --background-focused: #444;
-    --primary: #4d88ff;
-    --primary-focus: #0056b3;
-    --primary-muted: #163966;
-    --secondary: #b0bec5;
-    --secondary-focus: #8d9ca1;
-    --secondary-muted: #445056;
-    --color-neutral: #808080;
-    --color-neutral-focus: #a0a0a0;
-    --color-neutral-muted: #555555;
-    --error: #ff4444;
-    --error-focus: #ff0000;
-    --error-muted: #884848;
-    --success: #66cc66;
-    --success-focus: #2e8542;
-    --success-muted: #97d797;
-    --info: #4db8cc;
-    --info-focus: #378a9e;
-    --info-muted: #9cdde3;
-    --warning: #ffbb33;
-    --warning-focus: #e6a800;
-    --warning-muted: #fddc97;
 
-    --shdw-nums: 255, 255, 255;
+  .dark {
+    /* #f5f5f5 */
+    --rgb-foreground: 245 245 245;
+    /* #ccc */
+    --rgb-foreground-focused: 204 204 204;
+    /* #999 */
+    --rgb-foreground-muted: 153 153 153;
+    /* #333 */
+    --rgb-background: 51 51 51;
+    /* #555 */
+    --rgb-background-muted: 85 85 85;
+    /* #444 */
+    --rgb-background-focused: 68 68 68;
+    /* #02f2f2 */
+    --rgb-primary: 2 82 242;
+    /* #0056b3 */
+    --rgb-primary-focused: 0 86 179;
+    /* #163966 */
+    --rgb-primary-muted: 22 57 102;
+    /* #b0bec5 */
+    --rgb-secondary: 176 190 197;
+    /* #8d9ca1 */
+    --rgb-secondary-focused: 141 156 161;
+    /* #445056 */
+    --rgb-secondary-muted: 68 80 86;
+    /* #808080 */
+    --rgb-neutral: 128 128 128;
+    /* #a0a0a0 */
+    --rgb-neutral-focused: 160 160 160;
+    /* #555555 */
+    --rgb-neutral-muted: 85 85 85;
+    /* #ff4444 */
+    --rgb-error: 255 68 68;
+    /* #ff0000 */
+    --rgb-error-focused: 255 0 0;
+    /* #884848 */
+    --rgb-error-muted: 136 72 72;
+    /* #66cc66 */
+    --rgb-success: 102 204 102;
+    /* #2e8542 */
+    --rgb-success-focused: 46 133 66;
+    /* #97d797 */
+    --rgb-success-muted: 151 215 151;
+    /* #4db8cc */
+    --rgb-info: 77 184 204;
+    /* #378a9e */
+    --rgb-info-focused: 55 138 158;
+    /* #9cdde3 */
+    --rgb-info-muted: 156 221 227;
+    /* #ffbb33 */
+    --rgb-warning: 255 187 51;
+    /* #e6a800 */
+    --rgb-warning-focused: 230 168 0;
+    /* #fddc97 */
+    --rgb-warning-muted: 253 220 151;
   }
+
 }
 ```
 
@@ -835,42 +960,34 @@ export function ThemeToggle({ fixed = false }: { fixed?: boolean }) {
 export default {
   theme: {
     extend: {
-      colors: {
-        primary: 'var(--primary)',
-        primary_focus: 'var(--primary-focus)',
-        primary_muted: 'var(--primary-muted)',
-
-        secondary: 'var(--secondary)',
-        secondary_focus: 'var(--secondary-focus)',
-        secondary_muted: 'var(--secondary-muted)',
-
-        neutral: 'var(--neutral)',
-        neutral_focus: 'var(--neutral-focus)',
-        neutral_muted: 'var(--neutral-muted)',
-
-        foreground: 'var(--foreground)',
-        foreground_focus: 'var(--foreground-focus)',
-        foreground_muted: 'var(--foreground-muted)',
-
-        background: 'var(--background)',
-        background_focus: 'var(--background-focus)',
-        background_muted: 'var(--background-muted)',
-
-        error: 'var(--error)',
-        error_focus: 'var(--error-focus)',
-        error_muted: 'var(--error-muted)',
-
-        success: 'var(--success)',
-        success_focus: 'var(--success-focus)',
-        success_muted: 'var(--success-muted)',
-
-        info: 'var(--info)',
-        info_focus: 'var(--info-focus)',
-        info_muted: 'var(--info-muted)',
-
-        warning: 'var(--warning)',
-        warning_focus: 'var(--warning-focus)',
-        warning_muted: 'var(--warning-muted)',
+ colors: {
+        foreground: 'rgb(var(--rgb-foreground) / <alpha-value>)',
+        foreground_focused: 'rgb(var(--rgb-foreground-focused)/ <alpha-value>)',
+        foreground_muted: 'rgb(var(--rgb-foreground-muted) / <alpha-value>)',
+        background: 'rgb(var(--rgb-background) / <alpha-value>)',
+        background_focused: 'rgb(var(--rgb-background-focused)/ <alpha-value>)',
+        background_muted: 'rgb(var(--rgb-background-muted) / <alpha-value>)',
+        primary: 'rgb(var(--rgb-primary) / <alpha-value>)',
+        primary_focused: 'rgb(var(--rgb-primary-focused)/ <alpha-value>)',
+        primary_muted: 'rgb(var(--rgb-primary-muted) / <alpha-value>)',
+        secondary: 'rgb(var(--rgb-secondary) / <alpha-value>)',
+        secondary_focused: 'rgb(var(--rgb-secondary-focused)/ <alpha-value>)',
+        secondary_muted: 'rgb(var(--rgb-secondary-muted) / <alpha-value>)',
+        neutral: 'rgb(var(--rgb-neutral) / <alpha-value>)',
+        neutral_focused: 'rgb(var(--rgb-neutral-focused)/ <alpha-value>)',
+        neutral_muted: 'rgb(var(--rgb-neutral-muted) / <alpha-value>)',
+        error: 'rgb(var(--rgb-error) / <alpha-value>)',
+        error_focused: 'rgb(var(--rgb-error-focused)/ <alpha-value>)',
+        error_muted: 'rgb(var(--rgb-error-muted) / <alpha-value>)',
+        success: 'rgb(var(--rgb-success) / <alpha-value>)',
+        success_focused: 'rgb(var(--rgb-success-focused)/ <alpha-value>)',
+        success_muted: 'rgb(var(--rgb-success-muted) / <alpha-value>)',
+        info: 'rgb(var(--rgb-info) / <alpha-value>)',
+        info_focused: 'rgb(var(--rgb-info-focused)/ <alpha-value>)',
+        info_muted: 'rgb(var(--rgb-info-muted) / <alpha-value>)',
+        warning: 'rgb(var(--rgb-warning) / <alpha-value>)',
+        warning_focused: 'rgb(var(--rgb-warning-focused)/ <alpha-value>)',
+        warning_muted: 'rgb(var(--rgb-warning-muted) / <alpha-value>)',
       },
     }
   }
