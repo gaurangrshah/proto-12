@@ -17,7 +17,7 @@ export function ThemeToggle() {
 
   return (
     <button
-      className="fixed right-10 top-10 rounded-md border-current bg-gray-950 p-2 text-white hover:bg-gray-800 active:bg-gray-950"
+      className="btn btn-square fixed right-10 top-10 rounded-md"
       onClick={() =>
         currentTheme == 'dark' ? setTheme('light') : setTheme('dark')
       }
@@ -25,7 +25,11 @@ export function ThemeToggle() {
       {theme === 'light' ? (
         <MoonIcon className="h-5 w-5 stroke-current" strokeWidth={1} />
       ) : (
-        <SunIcon className="h-5 w-5 stroke-current" />
+        <SunIcon
+          className={`h-5 w-5 stroke-current ${
+            theme === 'light' ? 'opacity-0' : 'opacity-100'
+          }`}
+        />
       )}
     </button>
   );

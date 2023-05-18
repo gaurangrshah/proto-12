@@ -71,6 +71,13 @@
     --x-shdw: var(--x-shdw-x) var(--x-shdw-y) var(--x-shdw-blur)
       var(--x-shdw-spread) var(--shdw-rgba);
     /* ----- unused----- */
+
+    --bg: rgb(var(--rgb-background));
+    --text: rgb(var(--rgb-foreground));
+    --btn-text: var(--text);
+    --btn-bg: var(--bg);
+    --btn-bg-focus: rgb(var(--rgb-foreground-focused));
+    --btn-bg-muted: rgb(var(--rgb-foreground-muted));
   }
 
   .dark {
@@ -129,15 +136,6 @@
     /* #fddc97 */
     --rgb-warning-muted: 253 220 151;
   }
-
-  *:hover {
-    --shdw-opacity: 0.5;
-    --shdw-rgba: rgba(var(--shdw-nums), var(--shdw-opacity));
-  }
-  *:not(*:hover) {
-    --shdw-opacity: 0.1;
-    --shdw-rgba: rgba(var(--shdw-nums), var(--shdw-opacity));
-  }
 }
 
 @layer components {
@@ -163,99 +161,72 @@
     font-size: 0.95rem;
   }
 
-  /* Base button styles */
+  .primary {
+    --bg: rgb(var(--rgb-primary));
+    --text: rgb(var(--rgb-foreground));
+    --btn-bg: var(--bg);
+    --btn-bg-focus: rgb(var(--rgb-primary-focused));
+    --btn-bg-muted: rgb(var(--rgb-primary-muted));
+    --btn-text: var(--text);
+  }
+  .secondary {
+    --bg: rgb(var(--rgb-secondary));
+    --text: rgb(var(--rgb-foreground));
+    --btn-bg: var(--bg);
+    --btn-bg-focus: rgb(var(--rgb-secondary-focused));
+    --btn-bg-muted: rgb(var(--rgb-secondary-muted));
+    --btn-text: var(--text);
+  }
+
   .btn {
-    display: inline-block;
-    padding: 10px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 4px;
-    border: none;
-    color: #ffffff;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+    @apply inline-block cursor-pointer rounded-md border-transparent bg-[var(--btn-bg)] px-4 py-2 text-center text-base text-[var(--btn-text)] no-underline shadow-md transition-all duration-300 ease-in;
   }
 
-  /* Hover state */
   .btn:hover {
-    background-color: #0056b3;
+    @apply bg-[var(--btn-bg-focused)];
   }
 
-  /* Active state */
   .btn:active {
-    background-color: #003d80;
-    transform: translateY(1px);
+    @apply bg-[var(--btn-bg-muted)];
+    /* translate-y-1 */
   }
 
-  /* Focus state */
   .btn:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+    @apply focus:outline-none;
   }
 
-  /* Disabled state */
   .btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+    @apply cursor-not-allowed opacity-60;
   }
 
-  /* Ghost style */
   .btn-ghost {
-    background-color: transparent;
-    border: 1px solid #007bff;
+    @apply border border-black-alpha-100 bg-black-alpha-100 text-[var(--text)] transition-all duration-300 ease-in dark:border-white-alpha-100 dark:bg-white-alpha-100;
   }
 
   .btn-ghost:hover {
-    background-color: #007bff;
-    color: #ffffff;
+    @apply bg-black-alpha-500 dark:bg-white-alpha-500;
   }
-
+  .btn-ghost:focus {
+    @apply focus:outline-none;
+  }
   .btn-ghost:active {
-    background-color: #003d80;
-    border-color: #003d80;
-    transform: translateY(1px);
+    @apply border-none;
   }
-
-  /* Outline style */
   .btn-outline {
-    background-color: transparent;
-    border: 1px solid #007bff;
-    color: #007bff;
+    @apply border border-white-alpha-600 bg-transparent text-[var(--text)] transition-all duration-300 ease-in;
   }
 
   .btn-outline:hover {
-    background-color: #007bff;
-    color: #ffffff;
+    @apply border border-white;
   }
 
   .btn-outline:active {
-    background-color: #003d80;
-    border-color: #003d80;
-    transform: translateY(1px);
+    @apply border border-white-alpha-400;
   }
-
-  /* Round style */
   .btn-round {
-    border-radius: 50px;
+    @apply rounded-full py-5;
   }
-
-  .btn-round:active {
-    transform: translateY(1px);
-  }
-
-  /* Solid style */
-  .btn-solid {
-    background-color: #007bff;
-  }
-
-  .btn-solid:hover {
-    background-color: #0056b3;
-  }
-
-  .btn-solid:active {
-    background-color: #003d80;
-    transform: translateY(1px);
+  .btn-square {
+    @apply px-2 py-2;
   }
 }

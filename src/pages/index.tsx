@@ -7,7 +7,6 @@ import { DefaultLayout } from '@/components/_scaffold/layouts';
 import { ThemeToggle } from '@/components/_scaffold/ui';
 
 import { api } from '@/utils/api';
-import { bebas, inter } from '@/utils/fonts';
 
 const Home: NextPage = () => {
   const hello = api.example.hello.useQuery({ text: 'from tRPC' });
@@ -22,14 +21,12 @@ const Home: NextPage = () => {
       <ThemeToggle />
       <DefaultLayout>
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-          <h1
-            className={`font-dec text-5xl font-extrabold tracking-tight dark:text-red-400 sm:text-[5rem]`}
-          >
-            Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
+          <h1 className="font-dec text-5xl font-extrabold tracking-tight text-primary sm:text-[5rem]">
+            Create <span className="text-secondary">T3</span> App
           </h1>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
             <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 after:max-w-xs hover:bg-white/20"
+              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/40 p-4  after:max-w-xs hover:bg-white/20 dark:bg-white/10"
               href="https://create.t3.gg/en/usage/first-steps"
               target="_blank"
             >
@@ -61,6 +58,17 @@ const Home: NextPage = () => {
             </p>
             <AuthShowcase />
           </div>
+          {/* <ColorSquares /> */}
+          <div className="mx-auto flex w-full justify-center">
+            <button className="btn">Click</button>
+            <button className="btn primary">Click</button>
+            <button className="btn secondary">Click</button>
+            <button className="btn btn-outline">Click</button>
+            <button className="btn btn-ghost">Click</button>
+            <button className="btn btn-square">Click</button>
+            <button className="btn btn-round">Click</button>
+          </div>
+          <div className="h-6 w-6 bg-[rgb(var(--test))]"></div>
         </div>
       </DefaultLayout>
     </>
@@ -84,7 +92,7 @@ const AuthShowcase: React.FC = () => {
         {secretMessage && <span> - {secretMessage}</span>}
       </p>
       <button
-        className="rounded-full bg-white/10 px-10 py-3 font-dec font-semibold tracking-widest no-underline transition hover:bg-white/20"
+        className="rounded-full bg-primary px-10 py-3 font-dec font-semibold tracking-widest text-foreground no-underline transition hover:bg-white/20"
         onClick={sessionData ? () => void signOut() : () => void signIn()}
       >
         {sessionData ? 'Sign out' : 'Sign in'}
