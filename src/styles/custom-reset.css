@@ -26,7 +26,6 @@ body {
   box-sizing: 'border-box';
   scroll-behavior: smooth;
   font-size: 100%;
-  max-width: 100vw;
 }
 
 body {
@@ -52,37 +51,4 @@ main {
   align-items: center;
   min-height: 100vh;
   width: 100%;
-  /* color: var(--foreground);
-  background: var(--background); */
-  /* background: linear-gradient(to bottom, transparent, #2e026d) #15162c; */
 }
-
-/* .dark #__next,
-.dark #root,
-.dark main {
-  background: var(--foreground);
-  color: var(--background);
-} */
-
-/*
-a {
-  text-decoration: none;
-}
-
-a:active,
-a:focus,
-a:visited {
-  outline: none;
-  border: none;
-  outline-style: none;
-  text-decoration: none;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0) !important;
-}
-
-ol {
-  list-style-type: none;
-}
-
-ul {
-  list-style-type: none;
-} */

@@ -10,22 +10,17 @@ interface EditorProps {
 
 const EditorPage: React.FC<EditorProps> = ({ colors }) => {
   return (
-    <DefaultLayout full>
-      <div className="h-screen w-full">
-        <PaletteEditor colors={colors} />
-      </div>
+    <DefaultLayout full title="Palette Editor | Swatchr">
+      <PaletteEditor colors={colors} />
     </DefaultLayout>
   );
 };
 
 export const getServerSideProps: GetServerSideProps<EditorProps> = async (
-  context
+  ctx
 ) => {
-  const { query: ctxQuery } = context;
+  const colors = convertPalette.parse(ctx?.query?.colors as string);
 
-  const query = ctxQuery?.colors as string;
-
-  const colors = convertPalette.parse(query);
   return {
     props: {
       colors: colors?.length ? colors : ['#BADA55'],
