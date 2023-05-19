@@ -14,7 +14,7 @@
 *,
 *::before,
 *::after {
-  /* border-color: var(--contrast-rgb); */
+  /* border-color: var(--neutral-rgb); */
   box-sizing: 'border-box';
   word-wrap: 'break-word';
 }
@@ -45,10 +45,6 @@ body {
 #__next,
 #root,
 main {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   min-height: 100vh;
   width: 100%;
 }

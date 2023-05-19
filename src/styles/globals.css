@@ -230,3 +230,22 @@
     @apply px-2 py-2;
   }
 }
+
+@layer utilities {
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  .flex-responsive {
+    @apply flex flex-col md:h-screen md:w-full md:flex-row;
+  }
+  .flex-responsive-invert {
+    @apply flex flex-row md:h-screen md:w-full md:flex-col;
+  }
+  .flex-responsive-full {
+    @apply flex h-screen w-full flex-col md:h-screen md:w-full md:flex-row;
+  }
+  .flex-responsive-full-invert {
+    @apply flex h-screen w-full flex-row md:h-screen md:w-full md:flex-col;
+  }
+}

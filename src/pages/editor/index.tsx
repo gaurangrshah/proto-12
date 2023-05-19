@@ -1,17 +1,19 @@
 import type { GetServerSideProps } from 'next';
-import { convertPalette } from '@/utils';
+import { PaletteProvider } from '@/contexts/palette.context';
 
 import { DefaultLayout } from '@/components/_scaffold/layouts';
-import { PaletteEditor } from '@/components/palette';
+import { Palette } from '@/components/palette';
 
 interface EditorProps {
-  colors: string[];
+  paletteString: string;
 }
 
-const EditorPage: React.FC<EditorProps> = ({ colors }) => {
+const EditorPage: React.FC<EditorProps> = ({ paletteString }) => {
   return (
     <DefaultLayout full title="Palette Editor | Swatchr">
-      <PaletteEditor colors={colors} />
+      <PaletteProvider colors={paletteString}>
+        <Palette />
+      </PaletteProvider>
     </DefaultLayout>
   );
 };
@@ -19,11 +21,11 @@ const EditorPage: React.FC<EditorProps> = ({ colors }) => {
 export const getServerSideProps: GetServerSideProps<EditorProps> = async (
   ctx
 ) => {
-  const colors = convertPalette.parse(ctx?.query?.colors as string);
+  const paletteString = ctx?.query?.colors as string;
 
   return {
     props: {
-      colors: colors?.length ? colors : ['#BADA55'],
+      paletteString,
     },
   };
 };

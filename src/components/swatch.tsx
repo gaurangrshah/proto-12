@@ -1,45 +1,47 @@
-import { useRef } from 'react';
-import { useFocus } from '@/hooks';
+import { usePaletteDispatch } from '@/contexts/palette.context';
+import { useEditableControls, useFocus, useKeyboardShortcut } from '@/hooks';
 import { generateRandomColor, getContrastColor } from '@/utils';
 
 import { CircleIcon } from './icons';
 
 export const SwatchWrapper: React.FC<{
+  index: number;
   swatch: string;
-  updateColor: (color: string) => void;
-}> = ({ swatch, updateColor }) => {
-  const {
-    ref,
-    isActive,
-    props: focusProps,
-  } = useFocus({
-    onSpace: () => {
-      updateColor(generateRandomColor());
-    },
-  });
+}> = ({ index, swatch }) => {
+  const { updatePalette } = usePaletteDispatch();
+  const { isActive, ref, controls, props: focusProps } = useFocus({});
 
-  const handleUpdateColor = (newColor: string) => {
-    updateColor(newColor);
-    ref.current?.focus();
-  };
+  useKeyboardShortcut(
+    [' '],
+    () => {
+      if (!isActive) return; // needed to ensure that this is not triggered in editable input
+      updatePalette({ index, color: generateRandomColor() });
+    },
+    { overrideSystem: false, ignoreInputFields: true, ref }
+  );
 
   return (
     <div
+      ref={ref}
       className={`flex h-auto w-full flex-1 items-center justify-center`}
       style={{
         backgroundColor: swatch,
         color: getContrastColor(swatch ?? '#000'),
       }}
-      ref={ref}
-      // #NOTE: focused props adds: tabIndex and onKeydown + Mouse Enter/Leave
       {...focusProps}
+      // #NOTE: focusProps adds: tabIndex and onKeydown + Mouse Enter/Leave
     >
-      <Swatch swatch={swatch} updateColor={handleUpdateColor} />
+      <Swatch
+        swatch={swatch}
+        index={index}
+        updateColor={updatePalette}
+        controls={controls}
+      />
       {isActive ? (
         <div
           role="img"
           aria-label="active swatch"
-          className="invisible absolute bottom-20 z-[1] flex w-full items-center justify-center rounded-md md:visible"
+          className="invisible absolute bottom-20 z-[1] rounded-md md:visible"
         >
           <CircleIcon className="h-4 w-4 rounded-full bg-current opacity-30" />
         </div>
@@ -49,42 +51,40 @@ export const SwatchWrapper: React.FC<{
 };
 
 export const Swatch: React.FC<{
+  index: number;
   swatch: string;
-  updateColor: (color: string) => void;
-}> = ({ swatch, updateColor }) => {
-  const ref = useRef<HTMLDivElement>(null);
-
-  const onEnter = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      updateColor(e.currentTarget.textContent || '');
-      e.currentTarget.blur();
-    }
+  updateColor: ({ index, color }: { index: number; color: string }) => void;
+  controls: {
+    isActive: boolean;
+    handleFocus: () => void;
+    handleBlur: () => void;
   };
+}> = ({ index, swatch, updateColor, controls }) => {
+  const { ref, props: editableProps } = useEditableControls<HTMLDivElement>({
+    onEnter: (e: React.KeyboardEvent<HTMLDivElement>) => {
+      updateColor({ index, color: '#' + e.currentTarget.textContent || '' });
+    },
+    onFocus: () => {
+      controls.handleBlur();
+    },
+  });
 
-  const onEscape = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    e.currentTarget.blur();
-  };
+  const replaced = swatch.replace('#', '');
 
   return (
     <div className="flex h-44 w-44 items-center justify-center border border-current">
+      <div className="text-current/30 text-3xl">#</div>
       <div
         ref={ref}
         aria-label="hex-input"
         role="textbox"
         contentEditable={true}
         suppressContentEditableWarning={true}
-        data-placeholder={swatch}
+        data-placeholder={replaced}
         className="z-[2] cursor-text text-3xl"
-        onKeyDown={(e) => {
-          onEnter(e);
-          onEscape(e);
-          if (['ArrowLeft', 'ArrowRight'].includes(e.key)) {
-            e.preventDefault(); // #keep page from scrolling
-          }
-        }}
+        {...editableProps}
       >
-        {swatch}
+        {replaced}
       </div>
     </div>
   );
