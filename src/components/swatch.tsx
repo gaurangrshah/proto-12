@@ -62,6 +62,8 @@ export const Swatch: React.FC<{
 }> = ({ index, swatch, updateColor, controls }) => {
   const { ref, props: editableProps } = useEditableControls<HTMLDivElement>({
     onEnter: (e: React.KeyboardEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
       updateColor({ index, color: '#' + e.currentTarget.textContent || '' });
     },
     onFocus: () => {
