@@ -80,8 +80,9 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] Custom Analytics Wrapper
   - [x] UI: Consent Banner
   - [x] Vercel Analytics
-  - [ ] Implement in _app.tsx
-- [ ] Markdown
+  - [ ] Implement in _app.tsx - [pending]
+- [x] Markdown
+- [ ] NeDB
 
 ----
 
@@ -2975,6 +2976,170 @@ export { default } from 'next-auth/middleware';
 export const config = {
   // add policies to white-listed routes
   matcher: ['/((?!register|api|login|policies).*)'], 
+};
+
+```
+
+
+
+## [NeDB](https://github.com/louischatriot/nedb)
+
+```shell
+yarn add nedb
+```
+
+```shell
+yarn add -D @types/nedb
+```
+
+
+
+```tsx
+// lib/nedb/client.ts
+
+import path from 'path';
+import Datastore from 'nedb';
+
+const databaseFile = path.resolve('../../_data_/db.json');
+export const client = new Datastore({ filename: databaseFile, autoload: true });
+```
+
+
+
+```tsx
+// lib/nedb/handlers/index.ts
+
+import { client } from '../client';
+import { userPrefSchema } from '../queries';
+import type { UserPref } from '../queries';
+
+interface UserPreferences {
+  preferences: UserPref; // Adjust the type of preferences according to your specific needs
+}
+
+export function getLocalUserPrefs(): UserPref | null {
+  const preferencesString = localStorage.getItem('prefs');
+  if (preferencesString) {
+    return JSON.parse(preferencesString);
+  }
+  return null;
+}
+
+async function persistUserPrefs(preferences: UserPref): Promise<void> {
+  const preferencesString = JSON.stringify(preferences);
+  localStorage.setItem('prefs', preferencesString);
+}
+
+export async function saveUserPreferences(
+  preferences: UserPref
+): Promise<void> {
+  userPrefSchema.parse(preferences);
+  const existingPreferences = await getUserPreferences();
+  if (!existingPreferences) {
+    const localPreferences = getLocalUserPrefs();
+    if (localPreferences) {
+      preferences = { ...preferences, ...localPreferences }; // Use spread operator to merge preferences
+    }
+  }
+
+  return new Promise<void>((resolve, reject) => {
+    client.update<UserPreferences>(
+      {},
+      { preferences },
+      { upsert: true },
+      async (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          await persistUserPrefs(preferences); // Save preferences to localStorage
+          resolve();
+        }
+      }
+    );
+  });
+}
+
+export async function getUserPreferences(): Promise<UserPref | null> {
+  return new Promise<UserPref | null>((resolve, reject) => {
+    client.findOne<UserPreferences>({}, (err, doc) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(doc ? doc.preferences : null);
+      }
+    });
+  });
+}
+```
+
+```tsx
+// lib/nedb/queries/use-prefs.ts
+
+import { queryClient } from '@/utils';
+import { useMutation, useQuery } from '@tanstack/react-query';
+
+import { getUserPreferences, saveUserPreferences } from '../handlers';
+import type { UserPref } from './models';
+
+export function usePrefs() {
+  const { data, isLoading, error } = useQuery(['prefs'], getUserPreferences);
+
+  const mutation = useMutation(saveUserPreferences, {
+    onSuccess: () => {
+      // Invalidate the userPreferences query to refetch the latest data
+      queryClient.invalidateQueries(['prefs']);
+    },
+  });
+
+  const setUserPreferences = (preferences: Partial<UserPref>) => {
+    mutation.mutate(preferences);
+  };
+
+  return {
+    data,
+    isLoading,
+    error,
+    setUserPreferences,
+  };
+}Ï
+```
+
+### Usage:
+
+```tsx
+// pages/editor.tsx
+
+import { useEffect } from 'react';
+import { getLocalUserPrefs } from 'lib/nedb/handlers';
+import { usePrefs } from 'lib/nedb/queries';
+
+export const Palette: React.FC = () => {
+
+  const { data: prefs, isLoading, error, setUserPreferences } = usePrefs();
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (!prefs?.default) {
+      console.warn('loading fresh data data');
+      const localPreferences = getLocalUserPrefs();
+      if (localPreferences) {
+        setUserPreferences(localPreferences);
+        console.log('seeded local prefs');
+        return;
+      } else {
+        setUserPreferences({ mode: 'hex' });
+        console.log('seeded default prefs');
+        return;
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div className="flex-responsive-full">
+      Hello
+    </div>
+  );
 };
 
 ```
