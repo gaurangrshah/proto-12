@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { usePaletteDispatch } from '@/contexts/palette.context';
 import { useEditableControls, useFocus, useKeyboardShortcut } from '@/hooks';
 import { generateRandomColor, getContrastColor } from '@/utils';
-import { CursorArrowRippleIcon } from '@heroicons/react/24/outline';
+import { MinusCircleIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
 
 import { CircleIcon } from './icons';
 import { Popover } from './popover';
@@ -11,7 +11,7 @@ export const SwatchWrapper: React.FC<{
   index: number;
   swatch: string;
 }> = ({ index, swatch }) => {
-  const { updatePalette } = usePaletteDispatch();
+  const { updatePalette, addSwatch, removeSwatch } = usePaletteDispatch();
 
   const { isActive, ref, controls, props: focusProps } = useFocus({});
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
@@ -35,35 +35,56 @@ export const SwatchWrapper: React.FC<{
   );
   const gradientColor = `linear-gradient(to right, ${swatch}, ${newColor})`;
 
+  const addSwatchBefore = () => addSwatch(index);
+  const removeCurrentSwatch = () => removeSwatch(index);
+
   return (
-    <div
-      ref={ref}
-      className={`flex h-auto w-full flex-1 items-center justify-center focus:outline-none ${
-        isAnimating ? 'animate-color-transition' : ''
-      }`}
-      style={{
-        backgroundColor: isAnimating ? gradientColor : swatch,
-        color: getContrastColor(swatch ?? '#000'),
-      }}
-      {...focusProps}
-      // #NOTE: focusProps adds: tabIndex and onKeydown + Mouse Enter/Leave
-    >
-      <Swatch
-        swatch={swatch}
-        index={index}
-        updateColor={updatePalette}
-        controls={controls}
-      />
-      {isActive ? (
-        <div
-          role="img"
-          aria-label="active swatch"
-          className="invisible absolute bottom-20 z-[1] rounded-md md:visible"
-        >
-          <CircleIcon className="h-4 w-4 rounded-full bg-current opacity-30" />
+    <>
+      <div
+        ref={ref}
+        className={`relative flex h-auto w-full flex-1 items-center justify-center focus:outline-none ${
+          isAnimating ? 'animate-color-transition' : ''
+        }`}
+        style={{
+          backgroundColor: isAnimating ? gradientColor : swatch,
+          color: getContrastColor(swatch ?? '#000'),
+        }}
+        {...focusProps}
+        // #NOTE: focusProps adds: tabIndex and onKeydown + Mouse Enter/Leave
+      >
+        <Swatch
+          swatch={swatch}
+          index={index}
+          updateColor={updatePalette}
+          controls={controls}
+        />
+        {isActive ? (
+          <div
+            role="img"
+            aria-label="active swatch"
+            className="invisible absolute bottom-20 z-[1] rounded-md md:visible"
+          >
+            <CircleIcon className="h-4 w-4 rounded-full bg-current opacity-30" />
+          </div>
+        ) : null}
+        <div className="absolute right-3 top-1/2 flex -translate-y-1/2 transform flex-col gap-3">
+          <button
+            aria-label="Add New Swatch"
+            className="btn btn-square"
+            onClick={addSwatchBefore}
+          >
+            <PlusCircleIcon className="w-5" strokeWidth={2} />
+          </button>
+          <button aria-label="Remove Current Swatch" className="btn btn-square">
+            <MinusCircleIcon
+              className="w-5"
+              strokeWidth={2}
+              onClick={removeCurrentSwatch}
+            />
+          </button>
         </div>
-      ) : null}
-    </div>
+      </div>
+    </>
   );
 };
 
