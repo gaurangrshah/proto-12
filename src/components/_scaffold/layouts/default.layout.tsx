@@ -13,7 +13,7 @@ export const DefaultLayout: FCwChildren<WithSEO & { full?: boolean }> = ({
       <main
         className={`${full ? '' : 'my-6 p-6'} ${inter.variable} ${
           bebas.variable
-        } flex-center flex-col font-sans`}
+        } flex-center relative flex-col font-sans`}
       >
         {children}
       </main>
