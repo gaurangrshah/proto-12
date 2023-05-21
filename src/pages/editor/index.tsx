@@ -1,3 +1,4 @@
+import '@/components/shortcuts';
 import type { GetServerSideProps } from 'next';
 import { PaletteProvider } from '@/contexts/palette.context';
 import { queryClient } from '@/utils';
@@ -5,6 +6,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 
 import { DefaultLayout } from '@/components/_scaffold/layouts';
 import { Palette } from '@/components/palette';
+import { Shortcuts } from '@/components/shortcuts';
 
 interface EditorProps {
   paletteString: string;
@@ -17,6 +19,7 @@ const EditorPage: React.FC<EditorProps> = ({ paletteString }) => {
         <PaletteProvider colors={paletteString}>
           <Palette />
         </PaletteProvider>
+        <Shortcuts className="fixed right-16 top-10" />
       </DefaultLayout>
     </QueryClientProvider>
   );
