@@ -17,17 +17,23 @@ export function ThemeToggle() {
 
   return (
     <button
-      className="btn btn-square fixed right-10 top-10 rounded-md"
+      aria-label="Color Mode Toggle"
+      className="btn btn-square fixed right-6 top-10 z-10 rounded-md"
       onClick={() =>
         currentTheme == 'dark' ? setTheme('light') : setTheme('dark')
       }
     >
       {theme === 'light' ? (
-        <MoonIcon className="h-5 w-5 stroke-current" strokeWidth={1} />
+        <MoonIcon
+          className={`h-5 w-5 stroke-current transition-opacity ${
+            currentTheme === 'dark' ? 'fade-out' : 'fade-in'
+          }`}
+          strokeWidth={1}
+        />
       ) : (
         <SunIcon
-          className={`h-5 w-5 stroke-current ${
-            theme === 'light' ? 'opacity-0' : 'opacity-100'
+          className={`h-5 w-5 stroke-current transition-opacity ${
+            currentTheme === 'light' ? 'fade-out' : 'fade-in'
           }`}
         />
       )}
