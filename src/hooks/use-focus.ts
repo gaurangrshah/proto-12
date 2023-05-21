@@ -4,7 +4,6 @@ import { useKeyboardShortcut } from './use-keyboard-shortcut';
 
 type UseFocusProps = {
   onEscape?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
-  onSpace?: () => void;
 } & React.ComponentProps<'div'>;
 
 export function useFocus(props: UseFocusProps) {
@@ -63,30 +62,49 @@ export function useFocus(props: UseFocusProps) {
     };
   }, []);
 
-  const onLeftArrowDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'ArrowLeft') prevSiblingFocus();
-  };
-  const onRightArrowDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'ArrowRight') nextSiblingFocus();
-  };
-
-  const onEscape = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    e.currentTarget.blur();
-  };
-
-  useKeyboardShortcut([' '], () => props?.onSpace?.(), {
-    ref,
-    ignoreInputFields: true,
-  });
-
-  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    onEscape(e);
-    onLeftArrowDown(e);
-    onRightArrowDown(e);
-  };
+  useKeyboardShortcut(
+    ['Alt', 'ArrowLeft'],
+    () => {
+      prevSiblingFocus();
+    },
+    {
+      ref,
+      repeatOnHold: true,
+    }
+  );
+  useKeyboardShortcut(
+    ['Alt', 'ArrowRight'],
+    () => {
+      nextSiblingFocus();
+    },
+    {
+      ref,
+      repeatOnHold: true,
+    }
+  );
+  useKeyboardShortcut(
+    ['Alt', 'ArrowUp'],
+    () => {
+      prevSiblingFocus();
+    },
+    {
+      ref,
+      repeatOnHold: true,
+    }
+  );
+  useKeyboardShortcut(
+    ['Alt', 'ArrowUp'],
+    () => {
+      nextSiblingFocus();
+    },
+    {
+      ref,
+      repeatOnHold: true,
+    }
+  );
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { onEscape: _, onSpace: __, ...otherProps } = props; // destrcut for otherProps
+  const { onEscape: _, ...otherProps } = props; // destrcut for otherProps
 
   return {
     controls: {
@@ -98,9 +116,12 @@ export function useFocus(props: UseFocusProps) {
     ref,
     props: {
       tabIndex: 0,
-      onKeyDown,
-      // onMouseEnter: () => ref.current?.focus(),
-      // onMouseLeave: () => ref.current?.blur(),
+      onMouseEnter: () => {
+        ref.current?.focus();
+      },
+      onMouseLeave: () => {
+        ref.current?.blur();
+      },
       ...otherProps,
     },
   };

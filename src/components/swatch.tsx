@@ -1,31 +1,48 @@
+import { useState } from 'react';
 import { usePaletteDispatch } from '@/contexts/palette.context';
 import { useEditableControls, useFocus, useKeyboardShortcut } from '@/hooks';
 import { generateRandomColor, getContrastColor } from '@/utils';
+import { CursorArrowRippleIcon } from '@heroicons/react/24/outline';
 
 import { CircleIcon } from './icons';
+import { Popover } from './popover';
 
 export const SwatchWrapper: React.FC<{
   index: number;
   swatch: string;
 }> = ({ index, swatch }) => {
   const { updatePalette } = usePaletteDispatch();
+
   const { isActive, ref, controls, props: focusProps } = useFocus({});
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
+  const [newColor, setNewColor] = useState<string>(swatch);
 
   useKeyboardShortcut(
     [' '],
     () => {
-      if (!isActive) return; // needed to ensure that this is not triggered in editable input
-      updatePalette({ index, color: generateRandomColor() });
+      if (!isActive) return; // ensures that this is not triggered by the editable input
+      const generatedColor = generateRandomColor();
+
+      setIsAnimating(true);
+      setNewColor(generatedColor);
+
+      setTimeout(() => {
+        setIsAnimating(false);
+        updatePalette({ index, color: generatedColor });
+      }, 300);
     },
     { overrideSystem: false, ignoreInputFields: true, ref }
   );
+  const gradientColor = `linear-gradient(to right, ${swatch}, ${newColor})`;
 
   return (
     <div
       ref={ref}
-      className={`flex h-auto w-full flex-1 items-center justify-center`}
+      className={`flex h-auto w-full flex-1 items-center justify-center focus:outline-none ${
+        isAnimating ? 'animate-color-transition' : ''
+      }`}
       style={{
-        backgroundColor: swatch,
+        backgroundColor: isAnimating ? gradientColor : swatch,
         color: getContrastColor(swatch ?? '#000'),
       }}
       {...focusProps}
@@ -64,7 +81,13 @@ export const Swatch: React.FC<{
     onEnter: (e: React.KeyboardEvent<HTMLDivElement>) => {
       e.preventDefault();
       e.stopPropagation();
-      updateColor({ index, color: '#' + e.currentTarget.textContent || '' });
+      const newColor = '#' + e.currentTarget.textContent?.trim();
+      if (!newColor || newColor === swatch) return;
+      updateColor({
+        index,
+        color: newColor ?? swatch,
+      });
+      controls.handleFocus();
     },
     onFocus: () => {
       controls.handleBlur();
@@ -75,7 +98,7 @@ export const Swatch: React.FC<{
 
   return (
     <div className="flex h-44 w-44 items-center justify-center border border-current">
-      <div className="text-current/30 text-3xl">#</div>
+      <div className="text-current/30 select-none text-3xl">#</div>
       <div
         ref={ref}
         aria-label="hex-input"
@@ -85,6 +108,12 @@ export const Swatch: React.FC<{
         data-placeholder={replaced}
         className="z-[2] cursor-text text-3xl"
         {...editableProps}
+        onBlur={(e) => {
+          if (!e.currentTarget.textContent) {
+            e.currentTarget.textContent = swatch.replace('#', '');
+          }
+          e.currentTarget.textContent.trim();
+        }}
       >
         {replaced}
       </div>

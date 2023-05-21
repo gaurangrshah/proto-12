@@ -6,6 +6,7 @@ import {
   ANON_ID_KEY,
   DASHES_REGEX,
   HEX_COLOR_REGEX,
+  HEX_COLOR_WITHOUT_HASH_REGEX,
   UNDERSCORES_REGEX,
   isClient,
   isDev,
@@ -415,6 +416,12 @@ export function hexToRgbString(hex: string, opacity = 1) {
 
 export function isValidHexColor(value: string) {
   if (HEX_COLOR_REGEX.test(value)) {
+    return true;
+  }
+  return false;
+}
+export function isValidHexColorWithoutHash(value: string) {
+  if (HEX_COLOR_WITHOUT_HASH_REGEX.test(value)) {
     return true;
   }
   return false;

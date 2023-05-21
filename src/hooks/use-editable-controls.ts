@@ -12,12 +12,9 @@ export function useEditableControls<T extends HTMLElement | HTMLInputElement>({
 }) {
   const ref = useRef<T>(null);
   function onKeyDown(e: React.KeyboardEvent<T>) {
-    if (e.key === ' ') {
-      e.stopPropagation();
-    }
+    e.stopPropagation(); // ensures that the keyboard events do not bubble up to swatch wrapper
     if (e.key === 'Enter') {
       e.preventDefault(); // prevent new line in contentEditable
-      e.stopPropagation();
       ref.current?.blur();
       if (onEnter) {
         onEnter(e);
@@ -28,7 +25,6 @@ export function useEditableControls<T extends HTMLElement | HTMLInputElement>({
 
     if (e.key === 'Escape') {
       e.preventDefault();
-      e.stopPropagation();
       ref.current?.blur();
       if (onEscape) {
         onEscape(e);
@@ -40,8 +36,11 @@ export function useEditableControls<T extends HTMLElement | HTMLInputElement>({
 
   const onFocus = (e: React.FocusEvent<HTMLDivElement>) => {
     props?.onFocus?.(e);
+    if (e.currentTarget !== document.activeElement) return;
     // @NOTE: execCommand is deprecated, but still works: @SEE: https://stackoverflow.com/a/3805897
-    document.execCommand('selectAll', false, undefined);
+    // @UPDATE: added request animation frame otherwise chrome selects all elements indiscriminately
+    // @ SEE: https://stackoverflow.com/a/52926437
+    requestAnimationFrame(() => document.execCommand('selectAll'));
   };
 
   return { ref, props: { onKeyDown, onFocus, ...props } };
