@@ -67,6 +67,9 @@ export default {
         background: 'rgb(var(--rgb-background) / <alpha-value>)',
         background_focused: 'rgb(var(--rgb-background-focused)/ <alpha-value>)',
         background_muted: 'rgb(var(--rgb-background-muted) / <alpha-value>)',
+        background_alpha: 'var(--rgba-background-alpha)',
+        background_alpha_muted: 'var(--rgba-background-alpha-muted)',
+        background_alpha_focused: 'var(--rgba-background-alpha-focused)',
         primary: 'rgb(var(--rgb-primary) / <alpha-value>)',
         primary_focused: 'rgb(var(--rgb-primary-focused)/ <alpha-value>)',
         primary_muted: 'rgb(var(--rgb-primary-muted) / <alpha-value>)',
@@ -114,6 +117,7 @@ export default {
   },
   plugins: [
     require('@tailwindcss/typography'),
+    require('tailwindcss-animate'),
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     require('@headlessui/tailwindcss')({ prefix: 'ui' }),
   ],
