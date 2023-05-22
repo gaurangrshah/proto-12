@@ -23,6 +23,7 @@ export const SwatchWrapper: React.FC<{
 
   const { isActive, ref, controls, props: focusProps } = useFocus({});
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
+  const [showControls, setShowControls] = useState<boolean>(false);
   const [newColor, setNewColor] = useState<string>(swatch);
 
   useKeyboardShortcut(
@@ -59,6 +60,14 @@ export const SwatchWrapper: React.FC<{
         }}
         // #NOTE: focusProps adds: tabIndex + Mouse Enter/Leave + arrow key support
         {...focusProps}
+        onMouseEnter={(e) => {
+          e.currentTarget.focus();
+          setShowControls(true);
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.blur();
+          setShowControls(false);
+        }}
       >
         <Swatch
           swatch={swatch}
@@ -66,45 +75,49 @@ export const SwatchWrapper: React.FC<{
           updateColor={updatePalette}
           controls={controls}
         />
-        {isActive ? (
+        {isActive && !showControls ? (
           <div
             role="img"
-            aria-label="active swatch"
+            aria-label="active swatch indicator"
             className="invisible absolute bottom-20 z-[1] rounded-md md:visible"
           >
             <CircleIcon className="h-4 w-4 rounded-full bg-current opacity-30" />
           </div>
+        ) : isActive && showControls ? (
+          <div className="absolute bottom-48 z-[1] flex flex-row gap-3">
+            <Tooltip content="Add New Swatch">
+              <button
+                aria-label="Add New Swatch"
+                className="btn btn-square btn-ghost"
+                style={{ color: getContrastColor(swatch ?? '#000') }}
+                onClick={addSwatchBefore}
+                // onClick={console.log}
+              >
+                <PlusCircleIcon className="w-5" strokeWidth={2} />
+              </button>
+            </Tooltip>
+            <Tooltip content="Remove Icon">
+              <button
+                aria-label="Remove Current Swatch"
+                className="btn btn-square btn-ghost"
+                style={{ color: getContrastColor(swatch ?? '#000') }}
+                disabled={palette?.length === 1}
+              >
+                {palette && palette?.length > 1 ? (
+                  <MinusCircleIcon
+                    className="w-5"
+                    strokeWidth={2}
+                    onClick={removeCurrentSwatch}
+                    // onClick={console.log}
+                  />
+                ) : (
+                  <XCircleIcon className="w-5" strokeWidth={2} />
+                )}
+              </button>
+            </Tooltip>
+          </div>
         ) : null}
-        <div className="absolute right-3 top-1/2 flex -translate-y-1/2 transform flex-col gap-3">
-          <Tooltip content="Add New Swatch">
-            <button
-              aria-label="Add New Swatch"
-              className="btn btn-square btn-ghost"
-              style={{ color: getContrastColor(swatch ?? '#000') }}
-              onClick={addSwatchBefore}
-            >
-              <PlusCircleIcon className="w-5" strokeWidth={2} />
-            </button>
-          </Tooltip>
-          <Tooltip content="Remove Icon">
-            <button
-              aria-label="Remove Current Swatch"
-              className="btn btn-square btn-ghost"
-              style={{ color: getContrastColor(swatch ?? '#000') }}
-              disabled={palette?.length === 1}
-            >
-              {palette && palette?.length > 1 ? (
-                <MinusCircleIcon
-                  className="w-5"
-                  strokeWidth={2}
-                  onClick={removeCurrentSwatch}
-                />
-              ) : (
-                <XCircleIcon className="w-5" strokeWidth={2} />
-              )}
-            </button>
-          </Tooltip>
-        </div>
+        <div className="absolute right-3 top-1/2 flex -translate-y-1/2 transform flex-col gap-3"></div>
       </div>
     </>
   );

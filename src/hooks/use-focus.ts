@@ -116,12 +116,6 @@ export function useFocus(props: UseFocusProps) {
     ref,
     props: {
       tabIndex: 0,
-      onMouseEnter: () => {
-        ref.current?.focus();
-      },
-      onMouseLeave: () => {
-        ref.current?.blur();
-      },
       ...otherProps,
     },
   };
