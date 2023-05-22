@@ -47,13 +47,13 @@ export const StandardShortcutItem = ({
       <p className="text-sm">{action}</p>
       <div className="flex-center gap-2">
         {combo && modifier && (
-          <div className="flex-center h-6 w-6 rounded-md bg-background_muted p-1 py-2 text-sm font-bold text-current shadow-md">
+          <div className="flex-center bg-background__muted h-6 w-6 rounded-md p-1 py-2 text-sm font-bold text-current shadow-md">
             {SHORTCUT_MODIFIERS[modifier]}
           </div>
         )}
         <>
           {combo && <>+</>}
-          <div className="flex-center h-6 w-full rounded-md bg-background_muted px-2 text-sm font-semibold text-current shadow-md">
+          <div className="flex-center bg-background__muted h-6 w-full rounded-md px-2 text-sm font-semibold text-current shadow-md">
             {keyName}
           </div>
         </>
@@ -106,9 +106,9 @@ export const Shortcuts = (props: React.ComponentProps<'div'>) => {
               title="Palette Navigation"
               shortcuts={PALETTE_NAVIGATION}
               info={
-                <div className="rounded-md bg-background_focused px-1 py-2 text-xs">
+                <div className="bg-background__focused rounded-md px-1 py-2 text-xs">
                   <span className="font-bold">☝️</span> <span>Use</span>{' '}
-                  <span className="h-6 rounded-md border border-neutral_focused px-2 py-1 text-sm font-semibold text-foreground shadow-md">
+                  <span className="h-6 rounded-md border border-neutral_focused px-2 py-1 text-sm font-semibold text-foreground_ shadow-md">
                     Tab
                   </span>{' '}
                   <span>to cycle all elements</span>

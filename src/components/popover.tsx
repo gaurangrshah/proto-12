@@ -25,7 +25,7 @@ export const Popover: FCwChildren<{
         leaveFrom="transform scale-100 opacity-100"
         leaveTo="transform scale-95 opacity-0"
       >
-        <Popper.Panel className="absolute z-10 bg-background text-foreground">
+        <Popper.Panel className="bg-background_ absolute z-10 text-foreground_">
           {closable
             ? ({ close }) => (
                 <div className="relative h-16 w-24">
