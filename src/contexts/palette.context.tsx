@@ -9,9 +9,9 @@ import {
 import type { PropsWithChildren } from 'react';
 import { useRouter } from 'next/router';
 import {
-  addToArrayAtIndex,
   convertPalette,
   generateRandomColor,
+  insertAtIndex,
   removeFromArrayAtIndex,
 } from '@/utils';
 
@@ -36,7 +36,7 @@ export const PaletteProvider: PaletteProviderFC = ({ colors, children }) => {
 
   useEffect(() => {
     // @NOTE: ensures the page will refresh when using the back/fwd browser buttons.
-    setPalette(colors ? convertPalette.parse(colors) : ['BADA55']);
+    setPalette(colors ? convertPalette.parse(colors) : ['#BADA55']);
   }, [colors]);
 
   useEffect(() => {
@@ -65,11 +65,7 @@ export const PaletteProvider: PaletteProviderFC = ({ colors, children }) => {
     (index: number) => {
       if (!palette || !palette.length) return;
       const _palette = [...palette];
-      const newPalette = addToArrayAtIndex(
-        _palette,
-        index,
-        generateRandomColor()
-      );
+      const newPalette = insertAtIndex(_palette, index, generateRandomColor());
       setPalette(newPalette);
     },
     [palette]
@@ -77,7 +73,7 @@ export const PaletteProvider: PaletteProviderFC = ({ colors, children }) => {
 
   const removeSwatch = useCallback(
     (index: number) => {
-      if (!palette || !palette.length) return;
+      if (!palette || !palette.length || palette.length === 1) return;
       const _palette = [...palette];
       const newPalette = removeFromArrayAtIndex(_palette, index);
       setPalette(newPalette);
