@@ -1,12 +1,29 @@
-import { useEffect } from 'react';
-import { usePaletteState } from '@/contexts/palette.context';
+import { useEffect, useState } from 'react';
+import {
+  usePaletteDispatch,
+  usePaletteState,
+} from '@/contexts/palette.context';
+import { Reorder } from 'framer-motion';
 import { getLocalUserPrefs } from 'lib/nedb/handlers';
 import { usePrefs } from 'lib/nedb/queries';
+import useBreakpoint from 'use-breakpoint';
 
 import { SwatchWrapper } from './swatch';
 
+const TW_BREAKPOINTS = { sm: 640, md: 768, lg: 1024, xl: 1280, '2xl': 1536 }; // tw breakpoints: @SEE: https://tailwindcss.com/docs/screens
+
+const BREAKPOINTS = {
+  mobile: 0,
+  tablet: TW_BREAKPOINTS.md,
+  desktop: TW_BREAKPOINTS.lg,
+  wide: TW_BREAKPOINTS['2xl'],
+};
+
 export const Palette: React.FC = () => {
   const { palette } = usePaletteState();
+  const { _setPalette } = usePaletteDispatch();
+
+  const { breakpoint } = useBreakpoint(BREAKPOINTS, 'mobile');
 
   const { data: prefs, isLoading, error, setUserPreferences } = usePrefs();
 
@@ -29,12 +46,25 @@ export const Palette: React.FC = () => {
   }, []);
 
   return (
-    <div className="palette flex-responsive-full">
+    <Reorder.Group
+      className="palette flex-responsive-full h-screen w-screen"
+      axis={breakpoint === 'mobile' ? 'y' : 'x'}
+      values={palette ?? ['#BADA55']}
+      onReorder={_setPalette}
+    >
       {palette?.length
         ? palette.map((swatch, i) => {
-            return <SwatchWrapper key={swatch} index={i} swatch={swatch} />;
+            return (
+              <Reorder.Item
+                value={swatch}
+                key={swatch}
+                className="h-full w-full"
+              >
+                <SwatchWrapper key={swatch} swatch={swatch} index={i} />
+              </Reorder.Item>
+            );
           })
         : null}
-    </div>
+    </Reorder.Group>
   );
 };

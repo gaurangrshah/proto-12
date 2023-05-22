@@ -25,6 +25,7 @@ interface PaletteDispatch {
   updatePalette: ({ color }: updatePaletteArgs) => void;
   addSwatch: (index: number) => void;
   removeSwatch: (index: number) => void;
+  _setPalette: (newPalette: string[]) => void;
 }
 
 export const PaletteStateContext = createContext({} as PaletteState);
@@ -49,6 +50,10 @@ export const PaletteProvider: PaletteProviderFC = ({ colors, children }) => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [palette]);
+
+  const _setPalette = useCallback((newPalette: string[]) => {
+    setPalette((prevState) => Object.assign([], prevState, newPalette));
+  }, []);
 
   const updatePalette = useCallback(
     ({ index, color }: updatePaletteArgs) => {
@@ -83,8 +88,8 @@ export const PaletteProvider: PaletteProviderFC = ({ colors, children }) => {
 
   const state = useMemo(() => ({ palette }), [palette]);
   const dispatch = useMemo(
-    () => ({ updatePalette, addSwatch, removeSwatch }),
-    [updatePalette, addSwatch, removeSwatch]
+    () => ({ updatePalette, addSwatch, removeSwatch, _setPalette }),
+    [updatePalette, addSwatch, removeSwatch, _setPalette]
   );
 
   return (
