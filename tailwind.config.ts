@@ -6,6 +6,7 @@ export default {
   content: [
     './src/**/*.{js,ts,jsx,tsx}',
     './src/components/**/*.{js,ts,jsx,tsx}',
+    './components/**/*.{js,ts,jsx,tsx}',
     './src/pages/**/*.{js,ts,jsx,tsx}',
     // './src/app/**/*.{js,ts,jsx,tsx}',
   ],
@@ -22,6 +23,11 @@ export default {
         // #vgdy0w
         sans: ['var(--inter-font)', ...fontFamily.sans],
         dec: ['var(--bebas-font)', 'cursive'],
+      },
+      borderRadius: {
+        lg: `var(--radius)`,
+        md: `calc(var(--radius) - 2px)`,
+        sm: 'calc(var(--radius) - 4px)',
       },
       keyframes: {
         slideUpAndFade: {

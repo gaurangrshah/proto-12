@@ -115,6 +115,19 @@
     --btn-bg-muted: rgb(var(--rgb-foreground-muted));
   }
 
+  @layer base {
+    * {
+      @apply border-border font-sans;
+    }
+    body {
+      @apply bg-background text-foreground;
+      font-feature-settings: 'rlig' 1, 'calt' 1;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-family: sans-serif; /* @FIXME:  this is a hack, cannot get inter to work with shadcn/ui */
+    }
+  }
+
   .dark {
     --background: 224 71% 4%;
     --foreground: 213 31% 91%;
