@@ -11,7 +11,7 @@ import {
   XCircleIcon,
 } from '@heroicons/react/24/outline';
 import { CustomTooltip } from 'components/ui/tooltip';
-import { motion, useAnimation } from 'framer-motion';
+import { isBrowser, motion, useAnimation } from 'framer-motion';
 
 import { CircleIcon, DiceIcon } from './icons';
 
@@ -25,9 +25,7 @@ export const SwatchWrapper: React.FC<{
   const { updatePalette } = usePaletteDispatch();
 
   const { isActive, ref, controls, props: focusProps } = useFocus({});
-  const [isAnimating, setIsAnimating] = useState<boolean>(false);
   const [showControls, setShowControls] = useState<boolean>(false);
-  const [newColor, setNewColor] = useState<string>(swatch);
 
   const animation = useAnimation();
   useEffect(() => {
@@ -42,18 +40,12 @@ export const SwatchWrapper: React.FC<{
     () => {
       if (!isActive) return; // ensures that this is not triggered by the editable input
       const generatedColor = generateRandomColor();
-
-      setIsAnimating(true);
-      setNewColor(generatedColor);
-
       setTimeout(() => {
-        setIsAnimating(false);
         updatePalette({ index, color: generatedColor });
       }, 300);
     },
     { overrideSystem: false, ignoreInputFields: true, ref }
   );
-  // const gradientColor = `linear-gradient(to right, ${swatch}, ${newColor})`;
 
   return (
     <motion.div animate={animation}>
@@ -61,7 +53,6 @@ export const SwatchWrapper: React.FC<{
         ref={ref}
         className="flex h-full w-full flex-1 items-center justify-center focus:outline-none md:h-screen"
         style={{
-          // backgroundColor: isAnimating ? gradientColor : swatch,
           color: getContrastColor(swatch ?? '#000'),
         }}
         onMouseEnter={(e) => {
@@ -74,6 +65,12 @@ export const SwatchWrapper: React.FC<{
         }}
         // #NOTE: focusProps adds: tabIndex + Mouse Enter/Leave + arrow key support
         {...focusProps}
+        onBlur={() => {
+          if (!isBrowser) return;
+          // @HACK: unselects all selected text from contenteditable div
+          // @SEE: https://stackoverflow.com/a/37923136
+          window.getSelection()?.removeAllRanges();
+        }}
       >
         <Swatch
           swatch={swatch}

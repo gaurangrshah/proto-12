@@ -7,7 +7,6 @@ export function useEditableControls<T extends HTMLElement | HTMLInputElement>({
 }: {
   onEnter?: (e: React.KeyboardEvent<T>) => void;
   onEscape?: (e: React.KeyboardEvent<T>) => void;
-  onFocus?: (e: React.KeyboardEvent<T>) => void;
   props?: React.ComponentProps<'div'>;
 }) {
   const ref = useRef<T>(null);
@@ -40,8 +39,24 @@ export function useEditableControls<T extends HTMLElement | HTMLInputElement>({
     // @NOTE: execCommand is deprecated, but still works: @SEE: https://stackoverflow.com/a/3805897
     // @UPDATE: added request animation frame otherwise chrome selects all elements indiscriminately
     // @ SEE: https://stackoverflow.com/a/52926437
-    requestAnimationFrame(() => document.execCommand('selectAll'));
+    requestAnimationFrame(() => document.execCommand('selectAll', false));
+  };
+  const onBlur = (e: React.FocusEvent<HTMLDivElement>) => {
+    props?.onBlur?.(e);
+    if (e.currentTarget !== document.activeElement) return;
+    // @NOTE: execCommand is deprecated, but still works: @SEE: https://stackoverflow.com/a/3805897
+    // @UPDATE: added request animation frame otherwise chrome selects all elements indiscriminately
+    // @ SEE: https://stackoverflow.com/a/52926437
+    requestAnimationFrame(() => document.execCommand('selectAll', false));
   };
 
-  return { ref, props: { onKeyDown, onFocus, ...props } };
+  return {
+    ref,
+    props: Object.assign(
+      {},
+      props,
+      { onKeyDown, onFocus },
+      props.onBlur ? onBlur : {}
+    ),
+  };
 }
