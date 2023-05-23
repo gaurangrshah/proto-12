@@ -113,6 +113,8 @@
     --btn-bg: var(--bg);
     --btn-bg-focus: rgb(var(--rgb-foreground-focused));
     --btn-bg-muted: rgb(var(--rgb-foreground-muted));
+
+    --prepend: initial; /* @SEE: #eojJFdO quickly add content to any element */
   }
 
   @layer base {

@@ -9,6 +9,7 @@
   /* -webkit-tap-highlight-color: transparent; */
   -mox-osx-tap-highlight-color: transparent;
   white-space: 'normal';
+  content: var(--prepend); /* #eojJFdO quickly add content to any element */
 }
 
 *,
