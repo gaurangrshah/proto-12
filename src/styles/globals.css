@@ -325,8 +325,4 @@
   .flex-responsive-full-invert {
     @apply flex h-screen w-full flex-row md:h-screen md:w-full md:flex-col;
   }
-
-  .bg-transition {
-    animation: colorTransition;
-  }
 }

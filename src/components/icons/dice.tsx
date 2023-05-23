@@ -7,7 +7,6 @@ export function DiceIcon(props: React.SVGProps<SVGSVGElement>) {
       strokeMiterlimit="2"
       clipRule="evenodd"
       viewBox="0 0 36 38" // 0 0 37 37
-      fill="currentColor"
       {...props}
     >
       <path

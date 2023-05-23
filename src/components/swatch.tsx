@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   usePaletteDispatch,
   usePaletteState,
@@ -10,22 +10,32 @@ import {
   PlusCircleIcon,
   XCircleIcon,
 } from '@heroicons/react/24/outline';
+import { CustomTooltip } from 'components/ui/tooltip';
+import { motion, useAnimation } from 'framer-motion';
 
-import { CircleIcon } from './icons';
-import { Tooltip } from './tooltip';
+import { CircleIcon, DiceIcon } from './icons';
+
+const BG_TRANSITION = { duration: 0.5, ease: 'easeInOut' };
 
 export const SwatchWrapper: React.FC<{
   index: number;
   swatch: string;
-  key: string;
-}> = ({ index, swatch, key }) => {
+}> = ({ index, swatch }) => {
   const { palette } = usePaletteState();
-  const { updatePalette, addSwatch, removeSwatch } = usePaletteDispatch();
+  const { updatePalette } = usePaletteDispatch();
 
   const { isActive, ref, controls, props: focusProps } = useFocus({});
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
   const [showControls, setShowControls] = useState<boolean>(false);
   const [newColor, setNewColor] = useState<string>(swatch);
+
+  const animation = useAnimation();
+  useEffect(() => {
+    animation.start({
+      backgroundColor: swatch,
+      transition: BG_TRANSITION,
+    });
+  }, [swatch, animation]);
 
   useKeyboardShortcut(
     [' '],
@@ -43,83 +53,123 @@ export const SwatchWrapper: React.FC<{
     },
     { overrideSystem: false, ignoreInputFields: true, ref }
   );
-  const gradientColor = `linear-gradient(to right, ${swatch}, ${newColor})`;
-
-  const addSwatchBefore = () => addSwatch(index + 1);
-  const removeCurrentSwatch = () => removeSwatch(index);
+  // const gradientColor = `linear-gradient(to right, ${swatch}, ${newColor})`;
 
   return (
-    <div
-      ref={ref}
-      className={`relative flex h-full w-full flex-1 items-center justify-center focus:outline-none md:h-screen ${
-        isAnimating ? 'animate-color-transition' : ''
-      }`}
-      style={{
-        backgroundColor: isAnimating ? gradientColor : swatch,
-        color: getContrastColor(swatch ?? '#000'),
-      }}
-      // #NOTE: focusProps adds: tabIndex + Mouse Enter/Leave + arrow key support
-      {...focusProps}
-      onMouseEnter={(e) => {
-        e.currentTarget.focus();
-        setShowControls(true);
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.blur();
-        setShowControls(false);
-      }}
-    >
-      <Swatch
-        swatch={swatch}
-        index={index}
-        updateColor={updatePalette}
-        controls={controls}
-      />
-      {isActive && !showControls ? (
-        <div
-          role="img"
-          aria-label="active swatch indicator"
-          className="invisible absolute bottom-20 z-[1] rounded-md md:visible"
-        >
-          <CircleIcon className="h-4 w-4 rounded-full bg-current opacity-30" />
-        </div>
-      ) : isActive && showControls ? (
-        <div className="absolute bottom-48 z-[1] flex flex-row gap-3">
-          <Tooltip content="Add New Swatch">
-            <button
-              aria-label="Add New Swatch"
-              className="btn btn-square btn-ghost"
-              style={{ color: getContrastColor(swatch ?? '#000') }}
-              onClick={addSwatchBefore}
-              // onClick={console.log}
-            >
-              <PlusCircleIcon className="w-5" strokeWidth={2} />
-            </button>
-          </Tooltip>
-          <Tooltip content="Remove Icon">
-            <button
-              aria-label="Remove Current Swatch"
-              className="btn btn-square btn-ghost"
-              style={{ color: getContrastColor(swatch ?? '#000') }}
-              disabled={palette?.length === 1}
-            >
-              {palette && palette?.length > 1 ? (
-                <MinusCircleIcon
-                  className="w-5"
-                  strokeWidth={2}
-                  onClick={removeCurrentSwatch}
-                  // onClick={console.log}
-                />
-              ) : (
-                <XCircleIcon className="w-5" strokeWidth={2} />
-              )}
-            </button>
-          </Tooltip>
-        </div>
-      ) : null}
-      <div className="absolute right-3 top-1/2 flex -translate-y-1/2 transform flex-col gap-3"></div>
-    </div>
+    <motion.div animate={animation}>
+      <div
+        ref={ref}
+        className="flex h-full w-full flex-1 items-center justify-center focus:outline-none md:h-screen"
+        style={{
+          // backgroundColor: isAnimating ? gradientColor : swatch,
+          color: getContrastColor(swatch ?? '#000'),
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.focus();
+          setShowControls(true);
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.blur();
+          setShowControls(false);
+        }}
+        // #NOTE: focusProps adds: tabIndex + Mouse Enter/Leave + arrow key support
+        {...focusProps}
+      >
+        <Swatch
+          swatch={swatch}
+          index={index}
+          updateColor={updatePalette}
+          controls={controls}
+        />
+        {isActive && !showControls ? (
+          <div
+            role="img"
+            aria-label="active swatch indicator"
+            className="invisible absolute bottom-20 z-[1] rounded-md md:visible"
+          >
+            <CircleIcon className="h-4 w-4 rounded-full bg-current opacity-30" />
+          </div>
+        ) : (
+          <SwatchControls
+            showControls={showControls}
+            palette={palette}
+            index={index}
+          />
+        )}
+
+        <div className="absolute right-3 top-1/2 flex -translate-y-1/2 transform flex-col gap-3"></div>
+      </div>
+    </motion.div>
   );
+};
+
+export const SwatchControls: React.FC<{
+  showControls: boolean;
+  palette: string[] | null;
+  index: number;
+}> = ({ showControls, palette, index }) => {
+  const { updatePalette, addSwatch, removeSwatch } = usePaletteDispatch();
+  const swatch = palette ? palette[index] : null;
+  const addSwatchBefore = () => addSwatch(index + 1);
+  const removeCurrentSwatch = () => removeSwatch(index);
+  const contrast = getContrastColor(swatch ?? '#000');
+  return showControls ? (
+    <div className="absolute bottom-48 z-[1] flex flex-row gap-3">
+      <CustomTooltip
+        trigger={{
+          Component:
+            palette && palette?.length > 1 ? (
+              <MinusCircleIcon className="w-5" strokeWidth={2} />
+            ) : (
+              <XCircleIcon className="w-6 text-destructive" strokeWidth={2} />
+            ),
+          props: {
+            'aria-label': 'Add New Swatch',
+            onClick: removeCurrentSwatch,
+            style: { color: contrast },
+          },
+        }}
+        className="bg-popover p-2 text-sm text-popover-foreground"
+      >
+        {palette && palette?.length > 1
+          ? 'Remove Current Swatch'
+          : "Can't remove last swatch"}
+      </CustomTooltip>
+      <CustomTooltip
+        trigger={{
+          Component: <DiceIcon className="w-5 fill-current" strokeWidth={2} />,
+          props: {
+            'aria-label': 'Generate Random Color',
+            style: { color: contrast },
+            onClick: () =>
+              updatePalette({ color: generateRandomColor(), index }),
+          },
+        }}
+      >
+        <div className="flex">
+          <p>Random Color</p>
+          <span className="ml-2 rounded-md bg-neutral_ p-1 text-xs text-foreground">
+            space
+          </span>
+        </div>
+      </CustomTooltip>
+      <CustomTooltip
+        trigger={{
+          Component: <PlusCircleIcon className="w-5" strokeWidth={2} />,
+          props: {
+            'aria-label': 'Add New Swatch',
+            onClick: addSwatchBefore,
+            style: { color: contrast },
+          },
+        }}
+        className="bg-popover p-2 text-sm text-popover-foreground"
+      >
+        <div className="flex">
+          <p>Add Swatch</p>
+        </div>
+      </CustomTooltip>
+    </div>
+  ) : null;
 };
 
 export const Swatch: React.FC<{
