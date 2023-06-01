@@ -52,7 +52,7 @@ export const CustomTooltip: React.FC<TooltipProps> = ({
   return (
     <Tooltip.Provider>
       <Tooltip.Root>
-        <Tooltip.Trigger className="btn text-current" {...trigger.props}>
+        <Tooltip.Trigger className="btn bg alpha" {...trigger.props}>
           {trigger.Component}
         </Tooltip.Trigger>
         <Tooltip.Content className="p-2 text-sm" sideOffset={offset} {...props}>

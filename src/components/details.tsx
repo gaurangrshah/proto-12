@@ -75,7 +75,7 @@ export const CopyDropdownMenuItem = ({ val }: { val: string }) => {
       {isCopied ? (
         <CheckCircleIcon className="w-4" strokeWidth={2} />
       ) : (
-        <CopyIcon className="w-4" />
+        <CopyIcon className="w-4 text-foreground" />
       )}
     </div>
   );

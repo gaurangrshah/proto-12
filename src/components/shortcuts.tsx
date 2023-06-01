@@ -88,7 +88,7 @@ export const Shortcuts = (props: React.ComponentProps<'div'>) => {
   return (
     <div {...props}>
       <Popover className="relative">
-        <Popover.Button className="btn btn-square alpha">
+        <Popover.Button className="btn btn-square bg alpha">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="32"

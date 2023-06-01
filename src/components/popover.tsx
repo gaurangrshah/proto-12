@@ -1,4 +1,4 @@
-import { Component, Fragment, useRef } from 'react';
+import { Fragment, useRef } from 'react';
 import type { FCwChildren } from '@/types';
 import {
   Popover as Popper,
@@ -68,7 +68,7 @@ export const Popover: FCwChildren<
           >
             <Popper.Panel
               className={cn(
-                `min-w-xl min-h-36 absolute z-50 m-0 -translate-x-[calc(50%-3.5rem)] rounded-md bg-alpha p-0 text-popover-foreground `,
+                `min-w-xl min-h-36 absolute z-50 m-0 -translate-x-[calc(50%-3.5rem)] rounded-md bg-background/20 p-0 text-popover-foreground `,
                 className
               )}
               {...rest}
