@@ -39,6 +39,7 @@ export function useEditableControls<T extends HTMLElement | HTMLInputElement>({
     // @NOTE: execCommand is deprecated, but still works: @SEE: https://stackoverflow.com/a/3805897
     // @UPDATE: added request animation frame otherwise chrome selects all elements indiscriminately
     // @ SEE: https://stackoverflow.com/a/52926437
+    // @SEE: #gvttuW
     requestAnimationFrame(() => document.execCommand('selectAll', false));
   };
   const onBlur = (e: React.FocusEvent<HTMLDivElement>) => {
@@ -47,6 +48,7 @@ export function useEditableControls<T extends HTMLElement | HTMLInputElement>({
     // @NOTE: execCommand is deprecated, but still works: @SEE: https://stackoverflow.com/a/3805897
     // @UPDATE: added request animation frame otherwise chrome selects all elements indiscriminately
     // @ SEE: https://stackoverflow.com/a/52926437
+    // @SEE: #gvttuW
     requestAnimationFrame(() => document.execCommand('selectAll', false));
   };
 
