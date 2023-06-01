@@ -2,6 +2,21 @@ import tinycolor from 'tinycolor2';
 
 import { calculateContrastRatio } from './swtchr';
 
+type ContrastMode = 'light' | 'dark';
+
+export function getContrastMode(color: string): ContrastMode {
+  const colorObj = tinycolor(color);
+
+  // Get the perceived luminance of the color
+  const luminance = colorObj.getLuminance();
+
+  // Use a threshold value to determine if the color is considered "light" or "dark"
+  // You can adjust the threshold value to fit your needs
+  const threshold = 0.5;
+
+  return luminance > threshold ? 'dark' : 'light';
+}
+
 export function getContrastColor(hexColor: string) {
   // Calculate the contrast ratio between the input color and mid-gray
   let textColor = tinycolor.mostReadable(
