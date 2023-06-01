@@ -1,6 +1,5 @@
 import { type NextPage } from 'next';
 import Head from 'next/head';
-import Link from 'next/link';
 import { signIn, signOut, useSession } from 'next-auth/react';
 
 import { DefaultLayout } from '@/components/_scaffold/layouts';
@@ -22,53 +21,68 @@ const Home: NextPage = () => {
       <DefaultLayout>
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
           <h1 className="font-dec text-5xl font-extrabold tracking-tight text-primary sm:text-[5rem]">
-            Create <span className="text-secondary">T3</span> App
+            Create <span className="text-[var(--text-muted)]">T3</span> App
           </h1>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-neutral/20 p-4  after:max-w-xs hover:bg-neutral/40"
-              href="https://create.t3.gg/en/usage/first-steps"
-              target="_blank"
-            >
-              <h3 className="font-dec text-2xl font-bold tracking-wider">
-                First Steps →
-              </h3>
-              <div className="text-lg">
-                Just the basics - Everything you need to know to set up your
-                database and authentication.
-              </div>
-            </Link>
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-neutral/20 p-4  after:max-w-xs hover:bg-neutral/40"
-              href="https://create.t3.gg/en/introduction"
-              target="_blank"
-            >
-              <h3 className="font-dec text-2xl font-bold tracking-wider">
-                Documentation →
-              </h3>
-              <div className="text-lg">
-                Learn more about Create T3 App, the libraries it uses, and how
-                to deploy it.
-              </div>
-            </Link>
-          </div>
           <div className="flex flex-col items-center gap-2">
             <p className="text-2xl">
               {hello.data ? hello.data.greeting : 'Loading tRPC query...'}
             </p>
             <AuthShowcase />
           </div>
-          {/* <ColorSquares /> */}
-          <div className="mx-auto flex w-full justify-center">
-            <button className="btn">Click</button>
-            <button className="btn primary">Click</button>
-            <button className="btn secondary">Click</button>
-            <button className="btn btn-outline">Click</button>
-            <button className="btn btn-ghost">Click</button>
-            <button className="btn btn-square">Click</button>
-            <button className="btn btn-round">Click</button>
+
+          <div className="flex w-full flex-row items-center justify-center">
+            <div className="flex flex-col items-center gap-2">
+              <button className="btn bg default p-2 text-sm">default</button>
+              <p className="btn bg default muted p-2 text-sm text-foreground-invert">
+                muted
+              </p>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <p className="bg primary btn p-2 text-sm">primary</p>
+              <p className="bg primary muted btn p-2 text-sm text-foreground">
+                muted
+              </p>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <p className="btn bg secondary text-sm">secondary</p>
+              <p className="btn bg secondary muted text-sm">muted</p>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <p className="btn bg accent text-sm">accent</p>
+              <p className="btn bg accent muted text-sm">muted</p>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <p className="btn bg destructive text-sm">destructive</p>
+              <p className="btn bg destructive muted  text-sm">muted</p>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <p className="btn bg success text-sm">success</p>
+              <p className="btn bg success muted text-sm">muted</p>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <p className="btn bg info text-sm">info</p>
+              <p className="btn bg info muted text-sm">muted</p>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <button className="btn bg warning text-sm">warning</button>
+              <p className="btn bg warning muted text-sm">muted</p>
+              <button className="btn warning btn-outline text-sm">
+                warning
+              </button>
+              <button className="btn warning btn-ghost text-sm">warning</button>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <p className="btn bg alpha p-2 text-sm">alpha</p>
+              <p className="btn bg alpha muted p-2 text-sm">muted</p>
+            </div>
           </div>
-          <div className="h-6 w-6 bg-[rgb(var(--test))]"></div>
+          <div className="flex items-center gap-2 bg-accent p-1">
+            <div className="bg default border border-border p-1">arg</div>
+            <div className="border border-border bg-primary p-1 text-foreground/70">
+              arg
+            </div>
+            <div className="bg primary border border-border p-1">arg</div>
+          </div>
         </div>
       </DefaultLayout>
     </>
@@ -92,7 +106,7 @@ const AuthShowcase: React.FC = () => {
         {secretMessage && <span> - {secretMessage}</span>}
       </p>
       <button
-        className="text-foreground_ rounded-full bg-primary px-10 py-3 font-dec font-semibold tracking-widest no-underline transition hover:bg-white/20"
+        className="rounded-full bg-primary px-10 py-3 font-dec font-semibold tracking-widest text-foreground no-underline transition hover:bg-white/20"
         onClick={sessionData ? () => void signOut() : () => void signIn()}
       >
         {sessionData ? 'Sign out' : 'Sign in'}
