@@ -7,218 +7,240 @@
 @layer base {
   :root {
     /* light */
+    --background-hsl: 210 20% 98.04%; /* #FCFCFD */
 
-    --background: 0 0% 100%;
-    --foreground: 222.2 47.4% 11.2%;
+    --foreground-hsl: 224 71.43% 4.12%; /* #030712 */
+    --foreground-invert-hsl: 210 20% 98.04%; /* #FCFCFD */
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --primary-hsl: 217 91.22% 59.8%; /* #3B82F6 */
+    --secondary-hsl: 239 83.53% 66.67%; /* #6366F1 */
+    --accent-hsl: 160 84.08% 39.41%; /* #10B981 */
+    --success-hsl: 173 80.39% 40%; /* #14B8A6 */
+    --destructive-hsl: 0 84.24% 60.2%; /* #EF4444 */
+    --warning-hsl: 38 92.13% 50.2%; /* #F59E0B */
+    --info-hsl: 189 94.5% 42.75%; /* #0E7490 */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 47.4% 11.2%;
+    --bg-alpha: 1;
+    --muted: 0.3;
+    --focus: 0.7;
+    --color: var(--background-hsl);
+    --bg: hsl(var(--color), var(--bg-alpha));
+    --bg-muted: hsl(var(--background-hsl) / var(--muted));
+    --bg-focus: hsl(var(--background-hsl) / var(--focus));
+    --text: hsl(var(--foreground-hsl));
+    --text-muted: hsl(var(--foreground-hsl) / var(--muted));
+    --text-focus: hsl(var(--foreground-hsl) / var(--focus));
+    --text-invert: hsl(var(--foreground-invert-hsl));
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 47.4% 11.2%;
+    --popover: var(--text-muted);
+    --popover-foreground: hsl(var(--background-hsl) / var(--muted));
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --card: var(--bg-focus);
+    --card-foreground: var(--text-focus);
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 100% 50%;
-    --destructive-foreground: 210 40% 98%;
-
-    --ring: 215 20.2% 65.1%;
+    --border: theme('colors.gray.300');
+    --input: theme('colors.gray.300');
+    --ring: theme('colors.slate.400');
 
     --radius: 0.5rem;
 
-    /* #000 */
-    --rgb-foreground: 0 0 0;
-    /* #777 */
-    --rgb-foreground-focused: 119 119 119;
-    /* #999 */
-    --rgb-foreground-muted: 153 153 153;
-    /* #f5f5f5 */
-    --rgb-background: 245 245 245;
-    /* #ddd */
-    --rgb-background-muted: 221 221 221;
-    /* #eee */
-    --rgb-background-focused: 238 238 238;
-    --rgba-background-alpha: rgba(255, 255, 255, 0.5);
-    --rgba-background-alpha-muted: rgba(255, 255, 255, 0.2);
-    --rgba-background-alpha-focused: rgba(255, 255, 255, 0.8);
-    /* #00d5d5 */
-    --rgb-primary: 0 213 213;
-    /* #0080cc */
-    --rgb-primary-focused: 0 128 204;
-    /* #154d66 */
-    --rgb-primary-muted: 21 77 102;
-    /* #546e78 */
-    --rgb-secondary: 84 110 120;
-    /* #39484d */
-    --rgb-secondary-focused: 57 72 77;
-    /* #a2a9ad */
-    --rgb-secondary-muted: 162 169 173;
-    /* #9f9f9f */
-    --rgb-neutral: 159 159 159;
-    /* #7f7f7f */
-    --rgb-neutral-focused: 127 127 127;
-    /* #aaaaaa */
-    --rgb-neutral-muted: 170 170 170;
-    /* #ff6666 */
-    --rgb-error: 255 102 102;
-    /* #ff0000 */
-    --rgb-error-focused: 255 0 0;
-    /* #883333 */
-    --rgb-error-muted: 136 51 51;
-    /* #66cc66 */
-    --rgb-success: 102 204 102;
-    /* #2e8542 */
-    --rgb-success-focused: 46 133 66;
-    /* #97d797 */
-    --rgb-success-muted: 151 215 151;
-    /* #66a6cc */
-    --rgb-info: 102 166 204;
-    /* #3a6b8a */
-    --rgb-info-focused: 58 107 138;
-    /* #92c2e3 */
-    --rgb-info-muted: 146 194 227;
-    /* #ffc04d */
-    --rgb-warning: 255 192 77;
-    /* #e69d00 */
-    --rgb-warning-focused: 230 157 0;
-    /* #fdc97f */
-    --rgb-warning-muted: 253 201 127;
-
-    --shdw-nums: 255, 255, 255;
+    --shdw-nums-rgb: 255 255 255;
+    --shdw-nums: rgba(var(--shdw-nums-rgb), 0.5);
+    --shdw-color: var(--shdw-nums);
     /* ----- unused----- */
     --x-shdw-x: 2px;
     --x-shdw-y: -2px;
     --x-shdw-blur: 4px;
     --x-shdw-spread: 0px;
     --x-shdw: var(--x-shdw-x) var(--x-shdw-y) var(--x-shdw-blur)
-      var(--x-shdw-spread) var(--shdw-rgba);
+      var(--x-shdw-spread) var(--shdw-color);
     /* ----- unused----- */
 
-    --bg: rgb(var(--rgb-background));
-    --text: rgb(var(--rgb-foreground));
-    --btn-text: var(--text);
-    --btn-bg: var(--bg);
-    --btn-bg-focus: rgb(var(--rgb-foreground-focused));
-    --btn-bg-muted: rgb(var(--rgb-foreground-muted));
-
-    --prepend: initial; /* @SEE: #eojJFdO quickly add content to any element */
-  }
-
-  @layer base {
-    * {
-      @apply border-border font-sans;
-    }
-    body {
-      @apply bg-background text-foreground;
-      font-feature-settings: 'rlig' 1, 'calt' 1;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      font-family: sans-serif; /* @FIXME:  this is a hack, cannot get inter to work with shadcn/ui */
-    }
+    --prepend: initial; /* @SEE: #eojJFdO quickly add pseudo content to any element */
   }
 
   .dark {
-    --background: 224 71% 4%;
-    --foreground: 213 31% 91%;
+    --background-hsl: 224 71.43% 4.12%;
 
-    --muted: 223 47% 11%;
-    --muted-foreground: 215.4 16.3% 56.9%;
+    --foreground-hsl: 210 20% 98.04%;
+    --foreground-invert-hsl: 224 71.43% 4.12%;
 
-    --popover: 224 71% 4%;
-    --popover-foreground: 215 20.2% 65.1%;
+    --primary-hsl: 224 76.33% 48.04%;
+    --secondary-hsl: 245 57.94% 50.59%;
+    --accent-hsl: 163 93.55% 24.31%;
+    --success-hsl: 163 93.55% 24.31%;
+    --destructive-hsl: 0 73.71% 41.76%;
+    --warning-hsl: 26 90.48% 37.06%;
+    --info-hsl: 193 82.28% 30.98%;
 
-    --card: 224 71% 4%;
-    --card-foreground: 213 31% 91%;
+    --border: theme('colors.gray.800');
+    --input: theme('colors.gray.800');
+    --ring: theme('colors.slate.300');
 
-    --border: 216 34% 17%;
-    --input: 216 34% 17%;
+    --bg-alpha: 1;
+    --muted: 0.3;
+    --focus: 0.7;
+    --color: var(--background-hsl);
+    --bg: hsl(var(--color), var(--bg-alpha));
+    --bg-muted: hsl(var(--background-hsl) / var(--muted));
+    --bg-focus: hsl(var(--background-hsl) / var(--focus));
+    --text: hsl(var(--foreground-hsl));
+    --text-muted: hsl(var(--foreground-hsl) / var(--muted));
+    --text-focus: hsl(var(--foreground-hsl) / var(--focus));
+    --text-invert: hsl(var(--foreground-invert-hsl));
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 1.2%;
+    --shdw-nums: 0 0 0;
+    --shdw-rgba: rgba(var(--shdw-nums), 0.5);
+    --shdw-color: var(--shdw-rgba);
+  }
+}
 
-    --secondary: 222.2 47.4% 11.2%;
-    --secondary-foreground: 210 40% 98%;
+@layer base {
+  * {
+    @apply border-border font-sans;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: sans-serif; /* @FIXME:  this is a hack, cannot get inter to work with shadcn/ui */
+  }
 
-    --accent: 216 34% 17%;
-    --accent-foreground: 210 40% 98%;
+  .bg {
+    @apply bg-[var(--bg)] text-[var(--text)] disabled:bg-[var(--muted-bg)] disabled:text-[var(--muted-text)];
+  }
 
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
+  .muted {
+    --bg-alpha: var(--muted);
+  }
 
-    --ring: 216 34% 17%;
+  *:focus {
+    @apply focus:bg-[var(--focus-bg)] focus:text-[var(--focus-text)] focus:outline-none;
+  }
+  *:disabled {
+    --muted: 0.7;
+    @apply cursor-not-allowed opacity-60 disabled:bg-[var(--muted-bg)] disabled:text-[var(--text)];
+  }
 
-    --radius: 0.5rem;
+  .default {
+    --color: var(--foreground-hsl);
+    --bg: hsl(var(--color) / var(--bg-alpha));
+    --text: hsl(var(--background-hsl));
 
-    /* #f5f5f5 */
-    --rgb-foreground: 245 245 245;
-    /* #ccc */
-    --rgb-foreground-focused: 204 204 204;
-    /* #999 */
-    --rgb-foreground-muted: 153 153 153;
-    /* #333 */
-    --rgb-background: 51 51 51;
-    /* #555 */
-    --rgb-background-muted: 85 85 85;
-    /* #444 */
-    --rgb-background-focused: 68 68 68;
-    --rgba-background-alpha: rgba(0, 0, 0, 0.5);
-    --rgba-background-alpha-muted: rgba(0, 0, 0, 0.2);
-    --rgba-background-alpha-focused: rgba(0, 0, 0, 0.8);
-    /* #02f2f2 */
-    --rgb-primary: 2 82 242;
-    /* #0056b3 */
-    --rgb-primary-focused: 0 86 179;
-    /* #163966 */
-    --rgb-primary-muted: 22 57 102;
-    /* #b0bec5 */
-    --rgb-secondary: 176 190 197;
-    /* #8d9ca1 */
-    --rgb-secondary-focused: 141 156 161;
-    /* #445056 */
-    --rgb-secondary-muted: 68 80 86;
-    /* #808080 */
-    --rgb-neutral: 128 128 128;
-    /* #a0a0a0 */
-    --rgb-neutral-focused: 160 160 160;
-    /* #555555 */
-    --rgb-neutral-muted: 85 85 85;
-    /* #ff4444 */
-    --rgb-error: 255 68 68;
-    /* #ff0000 */
-    --rgb-error-focused: 255 0 0;
-    /* #884848 */
-    --rgb-error-muted: 136 72 72;
-    /* #66cc66 */
-    --rgb-success: 102 204 102;
-    /* #2e8542 */
-    --rgb-success-focused: 46 133 66;
-    /* #97d797 */
-    --rgb-success-muted: 151 215 151;
-    /* #4db8cc */
-    --rgb-info: 77 184 204;
-    /* #378a9e */
-    --rgb-info-focused: 55 138 158;
-    /* #9cdde3 */
-    --rgb-info-muted: 156 221 227;
-    /* #ffbb33 */
-    --rgb-warning: 255 187 51;
-    /* #e6a800 */
-    --rgb-warning-focused: 230 168 0;
-    /* #fddc97 */
-    --rgb-warning-muted: 253 220 151;
+    --focus-text: hsl(var(--background-hsl) / var(--focus));
+    /* --focus-bg: hsl(var(--color) / var(--focus)); */
+    --focus-bg: var(--bg-focus);
+
+    --muted-text: hsl(var(--background-hsl) / var(--muted));
+    /* --muted-bg: hsl(var(--color) / var(--muted)); */
+    --muted-bg: var(--bg-muted);
+  }
+
+  .primary {
+    --color: var(--primary-hsl);
+    --bg: hsl(var(--color) / var(--bg-alpha));
+    --text: hsl(var(--foreground-hsl), var(--fg-alpha));
+
+    --focus-text: hsl(var(--foreground-hsl) / var(--focus));
+    --focus-bg: hsl(var(--color) / var(--focus));
+
+    --muted-text: hsl(var(--primary-hsl) / var(--muted));
+    --muted-bg: hsl(var(--color) / var(--muted));
+  }
+
+  .secondary {
+    --color: var(--secondary-hsl);
+    --bg: hsl(var(--color) / var(--bg-alpha));
+    --text: hsl(var(--foreground-hsl), var(--fg-alpha));
+
+    --focus-text: hsl(var(--foreground-hsl) / var(--focus));
+    --focus-bg: hsl(var(--color) / var(--focus));
+
+    --muted-text: hsl(var(--secondary-hsl) / var(--muted));
+    --muted-bg: hsl(var(--color) / var(--muted));
+  }
+
+  .accent {
+    --color: var(--accent-hsl);
+    --bg: hsl(var(--color) / var(--bg-alpha));
+    --text: hsl(var(--foreground-hsl), var(--fg-alpha));
+
+    --focus-text: hsl(var(--foreground-hsl) / var(--focus));
+    --focus-bg: hsl(var(--color) / var(--focus));
+
+    --muted-text: hsl(var(--accent-hsl) / var(--muted));
+    --muted-bg: hsl(var(--color) / var(--muted));
+  }
+
+  .destructive {
+    --color: var(--destructive-hsl);
+    --bg: hsl(var(--color) / var(--bg-alpha));
+    --text: hsl(var(--foreground-hsl), var(--fg-alpha));
+
+    --focus-text: hsl(var(--foreground-hsl) / var(--focus));
+    --focus-bg: hsl(var(--color) / var(--focus));
+
+    --muted-text: hsl(var(--destructive-hsl) / var(--muted));
+    --muted-bg: hsl(var(--color) / var(--muted));
+  }
+
+  .success {
+    --color: var(--success-hsl);
+    --bg: hsl(var(--color) / var(--bg-alpha));
+    --text: hsl(var(--foreground-hsl), var(--fg-alpha));
+
+    --focus-text: hsl(var(--foreground-hsl) / var(--focus));
+    --focus-bg: hsl(var(--color) / var(--focus));
+
+    --muted-text: hsl(var(--success-hsl) / var(--muted));
+    --muted-bg: hsl(var(--color) / var(--muted));
+  }
+
+  .warning {
+    --color: var(--warning-hsl);
+    --bg: hsl(var(--color) / var(--bg-alpha));
+    --text: hsl(var(--foreground-hsl), var(--fg-alpha));
+
+    --focus-text: hsl(var(--foreground-hsl) / var(--focus));
+    --focus-bg: hsl(var(--color) / var(--focus));
+
+    --muted-text: hsl(var(--warning-hsl) / var(--muted));
+    --muted-bg: hsl(var(--color) / var(--muted));
+  }
+
+  .info {
+    --color: var(--info-hsl);
+    --bg: hsl(var(--color) / var(--bg-alpha));
+    --text: hsl(var(--foreground-hsl), var(--fg-alpha));
+
+    --focus-text: hsl(var(--foreground-hsl) / var(--focus));
+    --focus-bg: hsl(var(--color) / var(--focus));
+
+    --muted-text: hsl(var(--info-hsl) / var(--muted));
+    --muted-bg: hsl(var(--color) / var(--muted));
+  }
+  .alpha {
+    --color: var(--foreground-hsl);
+    --bg: hsl(var(--color) / 0.2);
+    --text: hsl(var(--color) / var(--fg-alpha));
+
+    --focus-text: hsl(var(--foreground-hsl) / var(--focus));
+    --focus-bg: hsl(var(--color) / var(--focus));
+
+    --muted-text: hsl(var(--foreground-hsl) / var(--muted));
+    --muted-bg: hsl(var(--color) / 0.02);
+  }
+
+  .foreground {
+    --text: var(--foreground);
+    --shdw-color: var(--text);
+    /* --btn-text: var(--text); */
+    @apply border-[var(--text)] text-[var(--text)] shadow-[var(--x-shdw)];
+  }
+
+  .invert:hover {
+    --text: hsl(var(--foreground-invert-hsl));
   }
 }
 
@@ -245,76 +267,45 @@
     font-size: 0.95rem;
   }
 
-  .primary {
-    --bg: rgb(var(--rgb-primary));
-    --text: rgb(var(--rgb-foreground));
-    --btn-bg: var(--bg);
-    --btn-bg-focus: rgb(var(--rgb-primary-focused));
-    --btn-bg-muted: rgb(var(--rgb-primary-muted));
-    --btn-text: var(--text);
-  }
-  .secondary {
-    --bg: rgb(var(--rgb-secondary));
-    --text: rgb(var(--rgb-foreground));
-    --btn-bg: var(--bg);
-    --btn-bg-focus: rgb(var(--rgb-secondary-focused));
-    --btn-bg-muted: rgb(var(--rgb-secondary-muted));
-    --btn-text: var(--text);
-  }
-  .alpha {
-    --bg: var(--rgba-background-alpha);
-    --text: rgb(var(--rgb-foreground));
-    --btn-bg: var(--bg);
-    --btn-bg-focus: var(--rgba-background-alpha-focused);
-    --btn-bg-muted: var(--rgba-background-alpha-muted);
-    --btn-text: var(--text);
-  }
-
   .btn {
-    @apply inline-block cursor-pointer rounded-md border-transparent bg-[var(--btn-bg)] px-4 py-2 text-center text-base text-[var(--btn-text)] no-underline shadow-md transition-all duration-300 ease-in;
+    @apply inline-block cursor-pointer rounded-md border-transparent px-4 py-2 text-center no-underline transition-all duration-300 ease-in;
   }
 
   .btn:hover {
-    @apply bg-[var(--btn-bg-focused)];
-  }
-
-  .btn:active {
-    @apply bg-[var(--btn-bg-muted)];
-    /* translate-y-1 */
-  }
-
-  .btn:focus {
-    @apply focus:outline-none;
-  }
-
-  .btn:disabled {
-    @apply cursor-not-allowed opacity-60;
+    @apply bg-[var(--focus-bg)] text-[var(--focus-text)];
   }
 
   .btn-ghost {
-    @apply border border-black-alpha-100 bg-black-alpha-100 text-[var(--text)] transition-all duration-300 ease-in dark:border-white-alpha-100 dark:bg-white-alpha-100;
+    --bg: hsl(var(--color) / 0.02);
+    --border: hsl(var(--color) / 0.1);
+    @apply border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] transition-all duration-300 ease-in;
   }
 
   .btn-ghost:hover {
-    @apply bg-black-alpha-500 dark:bg-white-alpha-500;
-  }
-  .btn-ghost:focus {
-    @apply focus:outline-none;
+    @apply bg-[var(--bg)];
   }
   .btn-ghost:active {
     @apply border-none;
   }
+  .btn-ghost:focus {
+    --bg: transparent;
+    @apply bg-[var(--bg)];
+  }
   .btn-outline {
-    @apply border border-white-alpha-600 bg-transparent text-[var(--text)] transition-all duration-300 ease-in;
+    /* --text: ; */
+    @apply border border-[var(--bg)] bg-transparent text-[var(--bg)] transition-all duration-300 ease-in;
   }
 
   .btn-outline:hover {
-    @apply border border-white;
+    @apply bg-transparent text-[var(--bg)] opacity-60 shadow-[var(--bg)];
   }
 
   .btn-outline:active {
-    @apply border border-white-alpha-400;
+    @apply border border-[var(--bg)];
   }
+  /* .btn-outline:focus {
+    @apply border border-[var(--bg)] bg-transparent text-[var(--bg)];
+  } */
   .btn-round {
     @apply rounded-full py-5;
   }

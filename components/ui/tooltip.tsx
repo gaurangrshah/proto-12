@@ -52,10 +52,7 @@ export const CustomTooltip: React.FC<TooltipProps> = ({
   return (
     <Tooltip.Provider>
       <Tooltip.Root>
-        <Tooltip.Trigger
-          className="btn btn-ghost text-current"
-          {...trigger.props}
-        >
+        <Tooltip.Trigger className="btn text-current" {...trigger.props}>
           {trigger.Component}
         </Tooltip.Trigger>
         <Tooltip.Content className="p-2 text-sm" sideOffset={offset} {...props}>
@@ -79,7 +76,7 @@ export const PortalTooltip: React.FC<TooltipProps> = ({
         </Tooltip.Trigger>
         <Tooltip.Portal>
           <Tooltip.Content
-            className="p-2 text-sm"
+            className="bg-popover p-2 text-sm"
             sideOffset={offset}
             {...props}
           >

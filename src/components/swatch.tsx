@@ -1,10 +1,14 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import {
   usePaletteDispatch,
   usePaletteState,
 } from '@/contexts/palette.context';
 import { useEditableControls, useFocus, useKeyboardShortcut } from '@/hooks';
-import { generateRandomColor, getContrastColor } from '@/utils';
+import {
+  generateRandomColor,
+  getContrastColor,
+  getContrastMode,
+} from '@/utils';
 import {
   MinusCircleIcon,
   PlusCircleIcon,
@@ -15,6 +19,9 @@ import { CustomTooltip } from 'components/ui/tooltip';
 import { isBrowser, motion, useAnimation } from 'framer-motion';
 import { PaletteIcon } from 'lucide-react';
 
+// import { useCSSVariable } from '@/hooks/use-css-variable';
+
+import { Details } from './details';
 import { CircleIcon, DiceIcon } from './icons';
 
 const BG_TRANSITION = { duration: 0.5, ease: 'easeInOut' };
@@ -36,6 +43,21 @@ export const SwatchWrapper: React.FC<{
       transition: BG_TRANSITION,
     });
   }, [swatch, animation]);
+
+  useLayoutEffect(() => {
+    if (!ref.current) return;
+    const isContrastLight = getContrastMode(swatch) === 'light';
+    ref.current.style.setProperty('--bg', swatch);
+    ref.current.style.setProperty('--text', getContrastColor(swatch));
+    // ref.current.style.setProperty(
+    //   '--popover',
+    //   isContrastLight ? 'var(--light-alpha)' : 'var(--dark-alpha))'
+    // );
+    // ref.current.style.setProperty(
+    //   '--popover-foreground',
+    //   isContrastLight ? '#000' : '#fff'
+    // );
+  }, [swatch, ref]);
 
   useKeyboardShortcut(
     [' '],
@@ -101,13 +123,14 @@ export const SwatchWrapper: React.FC<{
 
   return (
     <motion.div animate={animation}>
-      <CustomContextMenu items={swatchControls} title="Swatch Menu">
+      <CustomContextMenu
+        items={swatchControls}
+        title="Swatch Menu"
+        swatch={swatch}
+      >
         <div
           ref={ref}
-          className="flex h-full w-full flex-1 items-center justify-center focus:outline-none md:h-screen"
-          style={{
-            color: getContrastColor(swatch ?? '#000'),
-          }}
+          className="foreground flex h-full w-full flex-1 flex-col items-center justify-center focus:outline-none md:h-screen"
           onMouseEnter={(e) => {
             e.currentTarget.focus();
             setShowControls(true);
@@ -122,6 +145,7 @@ export const SwatchWrapper: React.FC<{
             if (!isBrowser) return;
             // @HACK: unselects all selected text from contenteditable div
             // @SEE: https://stackoverflow.com/a/37923136
+            // @SEE: #gvttuW
             window.getSelection()?.removeAllRanges();
           }}
         >
@@ -139,6 +163,9 @@ export const SwatchWrapper: React.FC<{
               controls={controls}
             />
           </motion.div>
+
+          <Details swatch={swatch} />
+
           {isActive && !showControls ? (
             <div
               role="img"
@@ -166,12 +193,11 @@ export const SwatchControls: React.FC<{
   index: number;
 }> = ({ showControls, palette, index }) => {
   const { updatePalette, addSwatch, removeSwatch } = usePaletteDispatch();
-  const swatch = palette ? palette[index] : null;
   const addSwatchBefore = () => addSwatch(index + 1);
   const removeCurrentSwatch = () => removeSwatch(index);
-  const contrast = getContrastColor(swatch ?? '#000');
+
   return showControls ? (
-    <div className="absolute bottom-48 z-[1] flex flex-row gap-3">
+    <div className="absolute bottom-48 z-[1] flex flex-row gap-3 text-inherit">
       <CustomTooltip
         trigger={{
           Component:
@@ -183,10 +209,9 @@ export const SwatchControls: React.FC<{
           props: {
             'aria-label': 'Add New Swatch',
             onClick: removeCurrentSwatch,
-            style: { color: contrast },
           },
         }}
-        className="bg-popover p-2 text-sm text-popover-foreground"
+        className="p-2 text-sm"
       >
         {palette && palette?.length > 1
           ? 'Remove Current Swatch'
@@ -197,7 +222,6 @@ export const SwatchControls: React.FC<{
           Component: <DiceIcon className="w-5 fill-current" strokeWidth={2} />,
           props: {
             'aria-label': 'Generate Random Color',
-            style: { color: contrast },
             onClick: () =>
               updatePalette({ color: generateRandomColor(), index }),
           },
@@ -205,7 +229,7 @@ export const SwatchControls: React.FC<{
       >
         <div className="flex">
           <p>Random Color</p>
-          <span className="ml-2 rounded-md bg-neutral_ p-1 text-xs text-foreground">
+          <span className="ml-2 rounded-md bg-background/30 p-1 text-xs text-foreground">
             space
           </span>
         </div>
@@ -216,10 +240,9 @@ export const SwatchControls: React.FC<{
           props: {
             'aria-label': 'Add New Swatch',
             onClick: addSwatchBefore,
-            style: { color: contrast },
           },
         }}
-        className="bg-popover p-2 text-sm text-popover-foreground"
+        className="p-2 text-sm"
       >
         <div className="flex">
           <p>Add Swatch</p>
@@ -261,7 +284,7 @@ export const Swatch: React.FC<{
   const replaced = swatch.replace('#', '');
 
   return (
-    <div className="flex h-44 w-44 items-center justify-center">
+    <div className="flex h-44 w-44 items-center justify-center text-inherit">
       <div className="text-current/30 mr-1 select-none font-dec text-5xl">
         #
       </div>
@@ -272,7 +295,7 @@ export const Swatch: React.FC<{
         contentEditable={true}
         suppressContentEditableWarning={true}
         data-placeholder={replaced}
-        className="z-[2] cursor-text font-dec text-5xl "
+        className="z-[2] cursor-text font-dec text-5xl selection:bg-[#BADA55] selection:text-background/30"
         {...editableProps}
         onBlur={(e) => {
           if (!e.currentTarget.textContent) {

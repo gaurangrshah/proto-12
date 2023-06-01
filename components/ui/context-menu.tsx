@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { isDev } from '@/utils';
+import { getContrastColor, isDev } from '@/utils';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import * as ContextMenuPrimitive from '@radix-ui/react-context-menu';
 import { cn } from 'lib/utils';
@@ -28,7 +28,7 @@ const ContextMenuSubTrigger = React.forwardRef<
   <ContextMenuPrimitive.SubTrigger
     ref={ref}
     className={cn(
-      'flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground',
+      'data-[state=open]:text-accent-foreground flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-foreground data-[state=open]:bg-accent',
       inset && 'pl-8',
       className
     )}
@@ -81,7 +81,7 @@ const ContextMenuItem = React.forwardRef<
   <ContextMenuPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       inset && 'pl-8',
       className
     )}
@@ -97,7 +97,7 @@ const ContextMenuCheckboxItem = React.forwardRef<
   <ContextMenuPrimitive.CheckboxItem
     ref={ref}
     className={cn(
-      'relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       className
     )}
     checked={checked}
@@ -121,7 +121,7 @@ const ContextMenuRadioItem = React.forwardRef<
   <ContextMenuPrimitive.RadioItem
     ref={ref}
     className={cn(
-      'relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       className
     )}
     {...props}
@@ -173,7 +173,7 @@ const ContextMenuShortcut = ({
   return (
     <span
       className={cn(
-        'ml-auto text-xs tracking-widest text-muted-foreground',
+        'ml-auto text-xs tracking-widest text-foreground/30',
         className
       )}
       {...props}
@@ -234,7 +234,7 @@ export const CustomContextMenuItem: React.FC<{ item: ContextMenuItem }> = ({
         <ContextMenuLabel className="text-xs">{item.label}</ContextMenuLabel>
         {item?.href ? <a>{item.href}</a> : null}
         {item?.shortcut ? (
-          <div className="text-border-neutral_ ml-3 rounded-md border border-neutral_ p-1 text-xs group-data-[disabled]:text-neutral_ group-data-[highlighted]:text-popover-foreground ">
+          <div className="border-muted ml-3 rounded-md border p-1 text-xs text-card-foreground group-data-[disabled]:text-foreground/30 group-data-[highlighted]:text-popover-foreground">
             {item.shortcut}
           </div>
         ) : null}
@@ -253,7 +253,7 @@ export const CustomContextMenuSub: React.FC<{
       <ContextMenuSubTrigger>
         {icon ? <div className="mr-4">{icon}</div> : null}
         {label}
-        <div className="group-data-[disabled]:text-mauve8 ml-auto pl-5 text-foreground group-data-[highlighted]:text-foreground">
+        <div className="ml-auto pl-5 text-foreground group-data-[disabled]:text-foreground/40 group-data-[highlighted]:text-foreground">
           <ChevronRightIcon />
         </div>
       </ContextMenuSubTrigger>
@@ -271,12 +271,9 @@ export const CustomContextMenuSub: React.FC<{
   );
 };
 
-export const CustomContextMenu: React.FC<ContextMenuProps> = ({
-  title,
-  items,
-  children,
-  ...props
-}) => {
+export const CustomContextMenu: React.FC<
+  ContextMenuProps & { swatch: string }
+> = ({ title, items, swatch, children, ...props }) => {
   if (isDev) return <>{children}</>;
   return (
     <ContextMenu>
@@ -285,7 +282,16 @@ export const CustomContextMenu: React.FC<ContextMenuProps> = ({
         <>
           {title ? (
             <>
-              <ContextMenuLabel className="text-sm">{title}</ContextMenuLabel>
+              <ContextMenuLabel
+                className="flex w-full justify-between"
+                style={{
+                  backgroundColor: swatch,
+                  color: getContrastColor(swatch ?? '#BADA55'),
+                }}
+              >
+                <p className="text-sm">{title}</p>
+                <p className="text-sm">{swatch}</p>
+              </ContextMenuLabel>
               <ContextMenuSeparator />
             </>
           ) : null}

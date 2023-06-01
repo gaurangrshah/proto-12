@@ -1,46 +1,96 @@
+import { Component, Fragment, useRef } from 'react';
 import type { FCwChildren } from '@/types';
-import { Popover as Popper, Transition } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import {
+  Popover as Popper,
+  Transition,
+  type PopoverButtonProps,
+} from '@headlessui/react';
+import { XCircleIcon } from '@heroicons/react/24/outline';
+import { cn } from 'lib/utils';
 
-export const Popover: FCwChildren<{
-  btnProps: Omit<React.ComponentProps<'button'>, 'ref'>;
-  btnLabel: string;
-  closable?: boolean;
-  overlay?: boolean;
-}> = ({ btnProps, btnLabel, closable, overlay, children }) => {
+export type ButtonProps = React.ComponentPropsWithoutRef<'button'> & {
+  className: string;
+};
+
+const timeoutDuration = 120;
+export const Popover: FCwChildren<
+  {
+    btn: {
+      label?: string;
+      props?: PopoverButtonProps<'button'>;
+      Component?: React.FC;
+    };
+
+    closable?: boolean;
+    overlay?: boolean;
+  } & React.ComponentPropsWithoutRef<(typeof Popper)['Panel']>
+> = ({ btn, closable, overlay, children, ...props }) => {
+  const { className, ...rest } = props;
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const timeOutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleEnter = (isOpen: boolean) => {
+    if (!timeOutRef.current) return;
+    clearTimeout(timeOutRef.current);
+    triggerRef.current?.focus();
+    !isOpen && triggerRef.current?.click();
+  };
+
+  const handleLeave = (isOpen: boolean) => {
+    timeOutRef.current = setTimeout(() => {
+      triggerRef.current?.blur();
+      isOpen && triggerRef.current?.click();
+    }, timeoutDuration);
+  };
+
   return (
     <Popper className="relative">
-      <Popper.Button {...btnProps}>
-        {btnLabel}{' '}
-        <ChevronDownIcon className="transition-transform ui-open:rotate-180 ui-open:transform ui-open:duration-200 ui-open:ease-out" />
-      </Popper.Button>
-      {overlay ? (
-        <Popper.Overlay className="fixed inset-0 bg-black opacity-30" />
-      ) : null}
-      <Transition
-        enter="transition duration-100 ease-out"
-        enterFrom="transform scale-95 opacity-0"
-        enterTo="transform scale-100 opacity-100"
-        leave="transition duration-75 ease-out"
-        leaveFrom="transform scale-100 opacity-100"
-        leaveTo="transform scale-95 opacity-0"
-      >
-        <Popper.Panel className="bg-background_ absolute z-10 text-foreground_">
-          {closable
-            ? ({ close }) => (
-                <div className="relative h-16 w-24">
-                  {children}
+      {({ open, close }) => (
+        <div
+          onMouseEnter={() => handleEnter(open)}
+          onMouseLeave={() => handleLeave(open)}
+        >
+          <Popper.Button {...btn?.props} ref={triggerRef}>
+            {btn?.label ?? ''}
+            {btn?.Component ? <btn.Component /> : null}
+          </Popper.Button>
+          {overlay ? (
+            <Popper.Overlay className="before:fixed before:inset-0 before:bg-black before:opacity-30" />
+          ) : null}
+          <Transition
+            as={Fragment}
+            enter="transition ease-out duration-200"
+            enterFrom="opacity-0 translate-y-5"
+            enterTo="opacity-100 translate-y-3"
+            leave="transition ease-in duration-150"
+            leaveFrom="opacity-100 translate-y-5"
+            leaveTo="opacity-0 translate-y-3"
+          >
+            <Popper.Panel
+              className={cn(
+                `min-w-xl min-h-36 absolute z-50 m-0 -translate-x-[calc(50%-3.5rem)] rounded-md bg-alpha p-0 text-popover-foreground `,
+                className
+              )}
+              {...rest}
+            >
+              {closable ? (
+                <div className="min-w-56 relative w-full p-2">
                   <button
-                    className="absolute right-4 top-4"
+                    aria-label="close"
+                    className="flex w-full justify-end py-1"
                     onClick={() => close()}
                   >
-                    close
+                    <XCircleIcon className="w-6 text-foreground-focus" />
                   </button>
+                  {children}
                 </div>
-              )
-            : children}
-        </Popper.Panel>
-      </Transition>
+              ) : (
+                <div className="min-w-56 relative w-full p-2">{children}</div>
+              )}
+            </Popper.Panel>
+          </Transition>
+        </div>
+      )}
     </Popper>
   );
 };
