@@ -34,7 +34,7 @@
 
     /* --popover: var(--bg-muted); */
     --popover: hsl(var(--color) / var(--muted));
-    --popover-foreground: var(--text-muted);
+    --popover-foreground: var(--text-focus);
 
     --card: var(--bg-focus);
     --card-foreground: var(--text-focus);
@@ -228,7 +228,7 @@
     --bg: hsl(var(--color) / 0.2);
     --text: hsl(var(--color) / var(--fg-alpha));
 
-    --focus-text: hsl(var(--foreground-hsl) / var(--focus));
+    --focus-text: hsl(var(--foreground-invert-hsl) / var(--focus));
     --focus-bg: hsl(var(--color) / var(--focus));
 
     --muted-text: hsl(var(--foreground-hsl) / var(--muted));
