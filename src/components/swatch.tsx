@@ -4,11 +4,7 @@ import {
   usePaletteState,
 } from '@/contexts/palette.context';
 import { useEditableControls, useFocus, useKeyboardShortcut } from '@/hooks';
-import {
-  generateRandomColor,
-  getContrastColor,
-  getContrastMode,
-} from '@/utils';
+import { generateRandomColor, getContrastColor } from '@/utils';
 import {
   MinusCircleIcon,
   PlusCircleIcon,
@@ -46,7 +42,7 @@ export const SwatchWrapper: React.FC<{
 
   useLayoutEffect(() => {
     if (!ref.current) return;
-    const isContrastLight = getContrastMode(swatch) === 'light';
+    // const isContrastLight = getContrastMode(swatch) === 'light';
     ref.current.style.setProperty('--bg', swatch);
     ref.current.style.setProperty('--text', getContrastColor(swatch));
     // ref.current.style.setProperty(
@@ -197,7 +193,7 @@ export const SwatchControls: React.FC<{
   const removeCurrentSwatch = () => removeSwatch(index);
 
   return showControls ? (
-    <div className="absolute bottom-48 z-[1] flex flex-row gap-3 text-inherit">
+    <div className="absolute bottom-48 z-[1] flex flex-row gap-3">
       <CustomTooltip
         trigger={{
           Component:
@@ -229,7 +225,7 @@ export const SwatchControls: React.FC<{
       >
         <div className="flex">
           <p>Random Color</p>
-          <span className="ml-2 rounded-md bg-background/30 p-1 text-xs text-foreground">
+          <span className="ml-2 rounded-md bg-background/30 p-1 text-xs">
             space
           </span>
         </div>
@@ -284,7 +280,7 @@ export const Swatch: React.FC<{
   const replaced = swatch.replace('#', '');
 
   return (
-    <div className="flex h-44 w-44 items-center justify-center text-inherit">
+    <div className="flex h-44 w-44 items-center justify-center">
       <div className="text-current/30 mr-1 select-none font-dec text-5xl">
         #
       </div>

@@ -68,7 +68,8 @@ export const Popover: FCwChildren<
           >
             <Popper.Panel
               className={cn(
-                `min-w-xl min-h-36 absolute z-50 m-0 -translate-x-[calc(50%-3.5rem)] rounded-md bg-background/20 p-0 text-popover-foreground `,
+                `min-w-xl min-h-36 2020 absolute z-50 m-0 -translate-x-[calc(50%-3.5rem)] rounded-md
+                 bg-popover p-1 text-popover-foreground shadow-md backdrop-blur-xl`,
                 className
               )}
               {...rest}
@@ -85,7 +86,7 @@ export const Popover: FCwChildren<
                   {children}
                 </div>
               ) : (
-                <div className="min-w-56 relative w-full p-2">{children}</div>
+                <div className="min-w-42 relative w-full p-2">{children}</div>
               )}
             </Popper.Panel>
           </Transition>
