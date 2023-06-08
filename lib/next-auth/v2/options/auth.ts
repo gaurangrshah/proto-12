@@ -1,7 +1,14 @@
 import type { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { prisma } from '@/server/db';
+import type { User } from '@prisma/client';
 import { compare } from 'bcryptjs';
+import { z } from 'zod';
+
+export const credentialsSchema = z.object({
+  email: z.string().trim().min(1, { message: 'Username or email is required' }),
+  password: z.string().trim().min(1, { message: 'Password is required' }),
+});
 
 const providers: NextAuthOptions['providers'] = [
   CredentialsProvider({
@@ -14,22 +21,22 @@ const providers: NextAuthOptions['providers'] = [
       },
       password: { label: 'Password', type: 'password' },
     },
-    async authorize(
-      credentials: Record<'email' | 'password', string> | undefined
-    ) {
-      if (!credentials?.email || !credentials.password) {
-        return null;
-      }
+    async authorize(credentials) {
+      const validCredentials = credentialsSchema.safeParse(credentials);
+      if (!validCredentials.success) return null;
 
       const user = await prisma.user.findUnique({
         where: {
-          email: credentials.email,
+          email: validCredentials.data.email,
         },
       });
 
       if (
         !user ||
-        !(await compare(credentials.password, user.password as string))
+        !(await compare(
+          validCredentials.data.password,
+          user.password as string
+        ))
       ) {
         return null;
       }
@@ -39,9 +46,8 @@ const providers: NextAuthOptions['providers'] = [
         email: user.email,
         name: user.name,
         emailVerified: user.emailVerified,
-        // randomKey: 'Hey cool',
         password: '', // @FIXME: Don't send back the password
-      };
+      } as User;
     },
   }),
 ];
@@ -53,7 +59,6 @@ export const authOptions: NextAuthOptions = {
   providers,
   callbacks: {
     session: ({ session, token }) => {
-      console.log('Session Callback', { session, token });
       return {
         ...session,
         user: {
@@ -64,7 +69,6 @@ export const authOptions: NextAuthOptions = {
       };
     },
     jwt: ({ token, user }) => {
-      console.log('JWT Callback', { token, user });
       if (user) {
         const u = user as unknown as any;
         return {
