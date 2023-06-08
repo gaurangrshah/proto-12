@@ -19,7 +19,7 @@ const EditorPage: React.FC<EditorProps> = ({ paletteString }) => {
         <PaletteProvider colors={paletteString}>
           <Palette />
         </PaletteProvider>
-        <Shortcuts className="fixed right-16 top-10" />
+        <Shortcuts className="fixed right-16 top-10 text-foreground-invert" />
       </DefaultLayout>
     </QueryClientProvider>
   );

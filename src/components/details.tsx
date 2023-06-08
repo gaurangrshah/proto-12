@@ -101,7 +101,7 @@ export const Details: React.FC<{ swatch: string }> = ({ swatch }) => {
             : undefined,
           props: {
             className:
-              'text-semibold rounded-md px-2 py-1 text-sm btn btn-outline btn-square transition-all duration-75 ease-in-out border-10 ',
+              'text-semibold rounded-md px-2 py-1 text-sm btn alpha transition-all duration-75 ease-in-out border-10 hover:text-foreground-invert',
           },
           Component: isLoading ? Spinner : undefined,
         }}

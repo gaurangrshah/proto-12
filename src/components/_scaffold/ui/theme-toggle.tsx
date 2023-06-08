@@ -25,14 +25,14 @@ export function ThemeToggle() {
     >
       {theme === 'light' ? (
         <MoonIcon
-          className={`h-5 w-5 stroke-current transition-opacity ${
+          className={`h-5 w-5 stroke-foreground-invert transition-opacity ${
             currentTheme === 'dark' ? 'fade-out' : 'fade-in'
           }`}
           strokeWidth={1}
         />
       ) : (
         <SunIcon
-          className={`h-5 w-5 stroke-current transition-opacity ${
+          className={`h-5 w-5 stroke-foreground-invert transition-opacity ${
             currentTheme === 'light' ? 'fade-out' : 'fade-in'
           }`}
         />

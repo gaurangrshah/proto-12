@@ -28,7 +28,7 @@ const ContextMenuSubTrigger = React.forwardRef<
   <ContextMenuPrimitive.SubTrigger
     ref={ref}
     className={cn(
-      'data-[state=open]:text-accent-foreground flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-foreground data-[state=open]:bg-accent',
+      'flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-foreground data-[state=open]:bg-accent data-[state=open]:text-foreground',
       inset && 'pl-8',
       className
     )}
@@ -63,7 +63,7 @@ const ContextMenuContent = React.forwardRef<
     <ContextMenuPrimitive.Content
       ref={ref}
       className={cn(
-        'z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md animate-in fade-in-80',
+        'z-50 min-w-[8rem] rounded-md border bg-popover p-1 text-popover-foreground shadow-md backdrop-blur-xl animate-in fade-in-80',
         className
       )}
       {...props}
@@ -253,7 +253,7 @@ export const CustomContextMenuSub: React.FC<{
       <ContextMenuSubTrigger>
         {icon ? <div className="mr-4">{icon}</div> : null}
         {label}
-        <div className="ml-auto pl-5 text-foreground group-data-[disabled]:text-foreground/40 group-data-[highlighted]:text-foreground">
+        <div className="ml-auto pl-5 text-current group-data-[disabled]:text-current group-data-[highlighted]:text-current">
           <ChevronRightIcon />
         </div>
       </ContextMenuSubTrigger>
