@@ -32,8 +32,9 @@
     --text-focus: hsl(var(--foreground-hsl) / var(--focus));
     --text-invert: hsl(var(--foreground-invert-hsl));
 
-    --popover: var(--text-muted);
-    --popover-foreground: hsl(var(--background-hsl) / var(--muted));
+    /* --popover: var(--bg-muted); */
+    --popover: hsl(var(--color) / var(--muted));
+    --popover-foreground: var(--text-muted);
 
     --card: var(--bg-focus);
     --card-foreground: var(--text-focus);
@@ -115,10 +116,12 @@
     --bg-alpha: var(--muted);
   }
 
-  *:focus {
+  .bg:focus,
+  .btn:disabled {
     @apply focus:bg-[var(--focus-bg)] focus:text-[var(--focus-text)] focus:outline-none;
   }
-  *:disabled {
+  .bg:disabled,
+  .btn:disabled {
     --muted: 0.7;
     @apply cursor-not-allowed opacity-60 disabled:bg-[var(--muted-bg)] disabled:text-[var(--text)];
   }
