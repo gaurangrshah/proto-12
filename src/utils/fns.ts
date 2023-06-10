@@ -37,6 +37,17 @@ export function encodeQueryParams(
   return queryParams.toString();
 }
 
+export async function localPersist({
+  key,
+  value,
+}: {
+  key: string;
+  value: Record<string, any>;
+}) {
+  const preferencesString = JSON.stringify(value);
+  localStorage.setItem(key, preferencesString);
+}
+
 /* -------------------------------------------------------------------------- */
 /*                                 ARRAY UTILS                                */
 /* -------------------------------------------------------------------------- */

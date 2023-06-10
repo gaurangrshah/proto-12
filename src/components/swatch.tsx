@@ -1,9 +1,14 @@
-import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   usePaletteDispatch,
   usePaletteState,
 } from '@/contexts/palette.context';
-import { useEditableControls, useFocus, useKeyboardShortcut } from '@/hooks';
+import {
+  useClickOutside,
+  useEditableControls,
+  useFocus,
+  useKeyboardShortcut,
+} from '@/hooks';
 import { generateRandomColor, getContrastColor } from '@/utils';
 import {
   MinusCircleIcon,
@@ -14,6 +19,10 @@ import { CustomContextMenu } from 'components/ui/context-menu';
 import { CustomTooltip } from 'components/ui/tooltip';
 import { isBrowser, motion, useAnimation } from 'framer-motion';
 import { PaletteIcon } from 'lucide-react';
+import { HexColorPicker } from 'react-colorful';
+
+import { useDebounce } from '@/hooks/use-debounce';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 
 // import { useCSSVariable } from '@/hooks/use-css-variable';
 
@@ -31,6 +40,7 @@ export const SwatchWrapper: React.FC<{
 
   const { isActive, ref, controls, props: focusProps } = useFocus({});
   const [showControls, setShowControls] = useState<boolean>(false);
+  const [picker, setPicker] = useLocalStorage('picker', false);
 
   const animation = useAnimation();
   useEffect(() => {
@@ -117,69 +127,94 @@ export const SwatchWrapper: React.FC<{
     [palette, index, swatch, addSwatch, removeSwatch, updatePalette]
   );
 
+  const handleDebouncedChange = useDebounce((newColor: string) => {
+    updatePalette({ index, color: newColor });
+  }, 200);
+
+  const pickerWrapperRef = useRef<HTMLDivElement>(null);
+  useClickOutside(pickerWrapperRef, () => setPicker(false));
+
   return (
-    <motion.div animate={animation}>
-      <CustomContextMenu
-        items={swatchControls}
-        title="Swatch Menu"
-        swatch={swatch}
-      >
-        <div
-          ref={ref}
-          className="foreground flex h-full w-full flex-1 flex-col items-center justify-center focus:outline-none md:h-screen"
-          onMouseEnter={(e) => {
-            e.currentTarget.focus();
-            setShowControls(true);
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.blur();
-            setShowControls(false);
-          }}
-          // #NOTE: focusProps adds: tabIndex + Mouse Enter/Leave + arrow key support
-          {...focusProps}
-          onBlur={() => {
-            if (!isBrowser) return;
-            // @HACK: unselects all selected text from contenteditable div
-            // @SEE: https://stackoverflow.com/a/37923136
-            // @SEE: #gvttuW
-            window.getSelection()?.removeAllRanges();
-          }}
+    <>
+      <motion.div animate={animation}>
+        <CustomContextMenu
+          items={swatchControls}
+          title="Swatch Menu"
+          swatch={swatch}
         >
-          <motion.div
-            initial={{ boxShadow: '0px 0px 20px rgba(0,0,0, 0.05)' }}
-            whileHover={{ boxShadow: '0px 0px 20px rgba(0,0,0, 0.25)' }}
-            whileTap={{ boxShadow: '0px 0px 20px rgba(0,0,0, 0.25)' }}
-            transition={{ duration: 0.33, ease: 'easeInOut', delay: 0.3 }}
-            className="relative flex h-56 w-56 cursor-pointer flex-col items-center justify-center rounded-lg"
+          <div
+            ref={ref}
+            className="foreground flex h-full w-full flex-1 flex-col items-center justify-center focus:outline-none md:h-screen"
+            onMouseEnter={(e) => {
+              e.currentTarget.focus();
+              setShowControls(true);
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.blur();
+              setShowControls(false);
+              setPicker(false);
+            }}
+            // #NOTE: focusProps adds: tabIndex + Mouse Enter/Leave + arrow key support
+            {...focusProps}
+            onBlur={() => {
+              if (!isBrowser) return;
+              // @HACK: unselects all selected text from contenteditable div
+              // @SEE: https://stackoverflow.com/a/37923136
+              // @SEE: #gvttuW
+              window.getSelection()?.removeAllRanges();
+            }}
           >
-            <Swatch
-              swatch={swatch}
-              index={index}
-              updateColor={updatePalette}
-              controls={controls}
-            />
-          </motion.div>
-
-          <Details swatch={swatch} />
-
-          {isActive && !showControls ? (
-            <div
-              role="img"
-              aria-label="active swatch indicator"
-              className="invisible absolute bottom-20 z-[1] rounded-md md:visible"
+            {picker && (
+              <div
+                ref={pickerWrapperRef}
+                className="absolute z-20 -mt-14 flex h-56 w-56 flex-col items-center justify-center"
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
+                onMouseUp={(e) => e.stopPropagation()}
+              >
+                <HexColorPicker
+                  color={swatch}
+                  onChange={handleDebouncedChange}
+                />
+              </div>
+            )}
+            <motion.div
+              initial={{ boxShadow: '0px 0px 20px rgba(0,0,0, 0.05)' }}
+              whileHover={{ boxShadow: '0px 0px 20px rgba(0,0,0, 0.25)' }}
+              whileTap={{ boxShadow: '0px 0px 20px rgba(0,0,0, 0.25)' }}
+              transition={{ duration: 0.33, ease: 'easeInOut', delay: 0.3 }}
+              className="relative flex h-56 w-56 cursor-pointer flex-col items-center justify-center rounded-lg"
+              onClick={() => setPicker(!picker)}
             >
-              <CircleIcon className="h-4 w-4 rounded-full bg-current opacity-30" />
-            </div>
-          ) : (
-            <SwatchControls
-              showControls={showControls}
-              palette={palette}
-              index={index}
-            />
-          )}
-        </div>
-      </CustomContextMenu>
-    </motion.div>
+              <Swatch
+                swatch={swatch}
+                index={index}
+                updateColor={updatePalette}
+                controls={controls}
+              />
+            </motion.div>
+
+            <Details swatch={swatch} />
+
+            {isActive && !showControls ? (
+              <div
+                role="img"
+                aria-label="active swatch indicator"
+                className="invisible absolute bottom-20 z-[1] rounded-md md:visible"
+              >
+                <CircleIcon className="h-4 w-4 rounded-full bg-current opacity-30" />
+              </div>
+            ) : (
+              <SwatchControls
+                showControls={showControls}
+                palette={palette}
+                index={index}
+              />
+            )}
+          </div>
+        </CustomContextMenu>
+      </motion.div>
+    </>
   );
 };
 
@@ -257,6 +292,10 @@ export const Swatch: React.FC<{
     handleFocus: () => void;
     handleBlur: () => void;
   };
+  // picker: {
+  //   show: boolean;
+  //   setShow: (show: boolean) => void;
+  // };
 }> = ({ index, swatch, updateColor, controls }) => {
   const { ref, props: editableProps } = useEditableControls<HTMLDivElement>({
     onEnter: (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -280,7 +319,7 @@ export const Swatch: React.FC<{
   const replaced = swatch.replace('#', '');
 
   return (
-    <div className="flex h-44 w-44 items-center justify-center">
+    <div className="flex h-44 w-44 items-center justify-center border">
       <div className="text-current/30 mr-1 select-none font-dec text-5xl">
         #
       </div>
@@ -299,6 +338,7 @@ export const Swatch: React.FC<{
           }
           e.currentTarget.textContent.trim();
         }}
+        onClick={(e) => e.stopPropagation()}
       >
         {replaced}
       </div>
