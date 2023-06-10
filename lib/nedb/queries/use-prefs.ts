@@ -22,6 +22,7 @@ export function usePrefs() {
     data,
     isLoading,
     error,
+    isReady: !isLoading && !error && !!data,
     setUserPreferences,
   };
 }
