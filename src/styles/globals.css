@@ -39,7 +39,7 @@
     --card: var(--bg-focus);
     --card-foreground: var(--text-focus);
 
-    --border: theme('colors.gray.300');
+    --border-: theme('colors.gray.300');
     --input: theme('colors.gray.300');
     --ring: theme('colors.slate.400');
 
