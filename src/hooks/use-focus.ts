@@ -1,50 +1,79 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useKeyboardShortcut } from './use-keyboard-shortcut';
 
 type UseFocusProps = {
+  index: number;
   onEscape?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
 } & React.ComponentProps<'div'>;
 
-export function useFocus(props: UseFocusProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [isActive, setIsActive] = useState<boolean>(false);
+export function useFocus<T extends HTMLElement>(props: UseFocusProps) {
+  const ref = useRef<T>(null);
+  const [activeIndex, setActiveIndex] = useState<number | null>(() => {
+    const storedIndex = localStorage.getItem('activeIndex');
+    return storedIndex ? parseInt(storedIndex, 10) : props.index;
+  });
 
   const prevSiblingFocus = () => {
-    if (!isActive || !ref.current) return;
-    const prevSibling = ref.current?.previousElementSibling as HTMLDivElement;
+    const prevSibling = ref.current?.previousElementSibling as T;
     if (prevSibling) {
+      setActiveIndex((prevIndex) => (prevIndex ? prevIndex - 1 : null));
       prevSibling.focus();
     } else {
-      // cycle back to to the last child
-      const parent = ref.current.parentElement;
+      const parent = ref.current?.parentElement;
       if (parent) {
-        const lastChild = parent.lastElementChild as HTMLDivElement;
+        const lastChild = parent.lastElementChild as T;
         if (lastChild) {
+          setActiveIndex((prevIndex) => {
+            if (prevIndex === 0)
+              return parseInt(lastChild.getAttribute('data-index') || '0', 10);
+            return prevIndex;
+          });
           lastChild.focus();
         }
       }
     }
   };
+
   const nextSiblingFocus = () => {
-    if (!isActive || !ref.current) return;
-    const nextSibling = ref.current?.nextElementSibling as HTMLDivElement;
+    const nextSibling = ref.current?.nextElementSibling as T;
     if (nextSibling) {
+      setActiveIndex((prevIndex) => (prevIndex ? prevIndex + 1 : null));
       nextSibling.focus();
     } else {
-      const parent = ref.current.parentElement;
+      const parent = ref.current?.parentElement;
       if (parent) {
-        // cycle back to to the first child
-        const firstChild = parent.firstElementChild as HTMLDivElement;
+        const firstChild = parent.firstElementChild as T;
         if (firstChild) {
+          setActiveIndex((prevIndex) => {
+            const nextIndex = parseInt(
+              firstChild.getAttribute('data-index') || '0',
+              10
+            );
+            if (prevIndex === nextIndex) return 0;
+            return prevIndex;
+          });
           firstChild.focus();
         }
       }
     }
   };
 
-  const handleFocus = () => setIsActive(true);
-  const handleBlur = () => setIsActive(false);
+  const handleFocus = useCallback(() => {
+    setActiveIndex(props.index);
+  }, [props.index]);
+
+  const handleBlur = useCallback(() => {
+    setActiveIndex(0);
+  }, []);
+
+  const handleMouseEnter = useCallback(() => {
+    setActiveIndex(props.index);
+  }, [props.index]);
+
+  const handleMouseLeave = useCallback(() => {
+    setActiveIndex(null);
+  }, []);
 
   useEffect(() => {
     const current = ref.current;
@@ -52,15 +81,19 @@ export function useFocus(props: UseFocusProps) {
     if (current) {
       current.addEventListener('focus', handleFocus);
       current.addEventListener('blur', handleBlur);
+      current.addEventListener('mouseenter', handleMouseEnter);
+      current.addEventListener('mouseleave', handleMouseLeave);
     }
 
     return () => {
       if (current) {
         current.removeEventListener('focus', handleFocus);
         current.removeEventListener('blur', handleBlur);
+        current.removeEventListener('mouseenter', handleMouseEnter);
+        current.removeEventListener('mouseleave', handleMouseLeave);
       }
     };
-  }, []);
+  }, [handleBlur, handleFocus, handleMouseEnter, handleMouseLeave]);
 
   useKeyboardShortcut(
     ['Alt', 'ArrowLeft'],
@@ -72,6 +105,7 @@ export function useFocus(props: UseFocusProps) {
       repeatOnHold: true,
     }
   );
+
   useKeyboardShortcut(
     ['Alt', 'ArrowRight'],
     () => {
@@ -82,29 +116,18 @@ export function useFocus(props: UseFocusProps) {
       repeatOnHold: true,
     }
   );
-  useKeyboardShortcut(
-    ['Alt', 'ArrowUp'],
-    () => {
-      prevSiblingFocus();
-    },
-    {
-      ref,
-      repeatOnHold: true,
-    }
-  );
-  useKeyboardShortcut(
-    ['Alt', 'ArrowUp'],
-    () => {
-      nextSiblingFocus();
-    },
-    {
-      ref,
-      repeatOnHold: true,
-    }
-  );
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { onEscape: _, ...otherProps } = props; // destrcut for otherProps
+  useEffect(() => {
+    if (!activeIndex) return;
+    localStorage.setItem('activeIndex', activeIndex.toString());
+    if (ref.current) {
+      ref.current.setAttribute('data-index', activeIndex.toString());
+    }
+  }, [activeIndex]);
+
+  const { onEscape: _, ...otherProps } = props;
+
+  const isActive = props.index === activeIndex;
 
   return {
     controls: {
@@ -112,7 +135,6 @@ export function useFocus(props: UseFocusProps) {
       handleFocus,
       handleBlur,
     },
-    isActive,
     ref,
     props: {
       tabIndex: 0,

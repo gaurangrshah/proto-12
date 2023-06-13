@@ -8,9 +8,10 @@ import { getLocalUserPrefs } from 'lib/nedb/handlers';
 import { usePrefs } from 'lib/nedb/queries';
 import useBreakpoint from 'use-breakpoint';
 
-import { SwatchWrapper } from './swatch';
+import { Swatch, SwatchWrapper } from './swatch';
 
-const TW_BREAKPOINTS = { sm: 640, md: 768, lg: 1024, xl: 1280, '2xl': 1536 }; // tw breakpoints: @SEE: https://tailwindcss.com/docs/screens
+// tw breakpoints: @SEE: https://tailwindcss.com/docs/screens
+const TW_BREAKPOINTS = { sm: 640, md: 768, lg: 1024, xl: 1280, '2xl': 1536 };
 
 const BREAKPOINTS = {
   mobile: 0,
@@ -19,16 +20,41 @@ const BREAKPOINTS = {
   wide: TW_BREAKPOINTS['2xl'],
 };
 
-export const Palette: React.FC = () => {
+const SwatchComponent = ({
+  swatch,
+  index,
+  reorder,
+}: {
+  swatch: string;
+  index: number;
+  reorder: boolean;
+}) => {
+  return (
+    <SwatchWrapper reorder={reorder} key={swatch} swatch={swatch} index={index}>
+      {({ swatch, index, reorder, updateColor, palette, isActive }) => (
+        <Swatch
+          swatch={swatch}
+          index={index}
+          reorder={reorder}
+          updateColor={updateColor}
+          palette={palette}
+          isActive={isActive}
+        />
+      )}
+    </SwatchWrapper>
+  );
+};
+
+export const Palette: React.FC<{ reorder: boolean }> = ({ reorder }) => {
+  const { data: prefs, isReady, setUserPreferences } = usePrefs();
+
   const { palette } = usePaletteState();
   const { _setPalette } = usePaletteDispatch();
 
   const { breakpoint } = useBreakpoint(BREAKPOINTS, 'mobile');
 
-  const { data: prefs, isLoading, error, setUserPreferences } = usePrefs();
-
   useEffect(() => {
-    if (isLoading) return;
+    if (isReady) return;
     if (!prefs?.mode) {
       console.warn('loading fresh data data');
       const localPreferences = getLocalUserPrefs();
@@ -46,25 +72,33 @@ export const Palette: React.FC = () => {
   }, []);
 
   return (
-    <Reorder.Group
-      className="palette flex-responsive-full h-screen w-screen"
-      axis={breakpoint === 'mobile' ? 'y' : 'x'}
-      values={palette ?? ['#BADA55']}
-      onReorder={_setPalette}
-    >
-      {palette?.length
-        ? palette.map((swatch, i) => {
-            return (
-              <Reorder.Item
-                value={swatch}
-                key={swatch}
-                className="h-full w-full"
-              >
-                <SwatchWrapper key={swatch} swatch={swatch} index={i} />
-              </Reorder.Item>
-            );
-          })
-        : null}
-    </Reorder.Group>
+    <>
+      <Reorder.Group
+        className="palette flex-responsive-full h-screen w-screen"
+        axis={breakpoint === 'mobile' ? 'y' : 'x'}
+        values={palette ?? ['#BADA55']}
+        onReorder={_setPalette}
+      >
+        {palette?.length
+          ? palette.map((swatch, i) => {
+              return reorder ? (
+                <Reorder.Item
+                  value={swatch}
+                  key={swatch}
+                  className="h-full w-full"
+                >
+                  <SwatchComponent
+                    swatch={swatch}
+                    index={i}
+                    reorder={reorder}
+                  />
+                </Reorder.Item>
+              ) : (
+                <SwatchComponent swatch={swatch} index={i} reorder={reorder} />
+              );
+            })
+          : null}
+      </Reorder.Group>
+    </>
   );
 };
