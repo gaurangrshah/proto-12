@@ -36,20 +36,21 @@ export function useEditableControls<T extends HTMLElement | HTMLInputElement>({
   const onFocus = (e: React.FocusEvent<HTMLDivElement>) => {
     props?.onFocus?.(e);
     if (e.currentTarget !== document.activeElement) return;
-    // @NOTE: execCommand is deprecated, but still works: @SEE: https://stackoverflow.com/a/3805897
-    // @UPDATE: added request animation frame otherwise chrome selects all elements indiscriminately
-    // @ SEE: https://stackoverflow.com/a/52926437
-    // @SEE: #gvttuW
-    requestAnimationFrame(() => document.execCommand('selectAll', false));
+
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(ref.current as Node);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
   };
+
   const onBlur = (e: React.FocusEvent<HTMLDivElement>) => {
     props?.onBlur?.(e);
     if (e.currentTarget !== document.activeElement) return;
-    // @NOTE: execCommand is deprecated, but still works: @SEE: https://stackoverflow.com/a/3805897
-    // @UPDATE: added request animation frame otherwise chrome selects all elements indiscriminately
-    // @ SEE: https://stackoverflow.com/a/52926437
-    // @SEE: #gvttuW
-    requestAnimationFrame(() => document.execCommand('selectAll', false));
+
+    const selection = window.getSelection();
+    selection?.removeAllRanges();
+    e.currentTarget.blur();
   };
 
   return {
