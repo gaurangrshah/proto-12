@@ -4,10 +4,12 @@ import { HexColorPicker } from 'react-colorful';
 
 export function Pickers({
   swatch,
+  mode = 'hex', // @TODO: add support for other color modes
   onChange,
   onClose,
 }: {
   swatch: string;
+  mode: string;
   onChange: (color: string) => void;
   onClose: () => void;
 }) {

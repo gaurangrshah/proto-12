@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect } from 'react';
+import { useEffect } from 'react';
 import {
   usePaletteDispatch,
   usePaletteState,
@@ -35,13 +35,21 @@ export const SwatchComponent = ({
   swatch,
   index,
   reorder,
+  mode = 'hex',
 }: {
   swatch: string;
   index: number;
   reorder: boolean;
+  mode?: string;
 }) => {
   return (
-    <SwatchWrapper reorder={reorder} key={swatch} swatch={swatch} index={index}>
+    <SwatchWrapper
+      reorder={reorder}
+      key={swatch}
+      swatch={swatch}
+      index={index}
+      mode={mode}
+    >
       {({ swatch, updateColor }) => (
         <Swatch swatch={swatch} updateColor={updateColor} />
       )}
@@ -53,11 +61,13 @@ export const SwatchWrapper = ({
   index,
   swatch,
   reorder,
+  mode,
   children,
 }: {
   index: number;
   swatch: string;
   reorder: boolean;
+  mode: string;
   children: (props: {
     swatch: string;
     updateColor: ({ color }: { color: string }) => void;
@@ -123,6 +133,7 @@ export const SwatchWrapper = ({
           <div onClick={() => setPicker(!picker)}>
             {!reorder && picker && (
               <Pickers
+                mode={mode}
                 swatch={swatch}
                 onChange={handleDebouncedChange}
                 onClose={() => setPicker(false)}

@@ -61,7 +61,12 @@ export const Palette: React.FC<{ reorder: boolean }> = ({ reorder }) => {
                 key={swatch}
                 className="h-full w-full"
               >
-                <SwatchComponent swatch={swatch} index={i} reorder={reorder} />
+                <SwatchComponent
+                  swatch={swatch}
+                  index={i}
+                  reorder={reorder}
+                  mode={prefs?.mode ?? undefined}
+                />
               </Reorder.Item>
             ) : (
               <SwatchComponent
@@ -69,6 +74,7 @@ export const Palette: React.FC<{ reorder: boolean }> = ({ reorder }) => {
                 swatch={swatch}
                 index={i}
                 reorder={reorder}
+                mode={prefs?.mode ?? undefined}
               />
             );
           })
