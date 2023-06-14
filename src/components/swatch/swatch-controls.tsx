@@ -44,6 +44,7 @@ export const SwatchControls: React.FC<{
               props: {
                 'aria-label': 'Add New Swatch',
                 onClick: removeCurrentSwatch,
+                asChild: false,
               },
             }}
             className="p-2 text-sm"
@@ -61,6 +62,7 @@ export const SwatchControls: React.FC<{
                 'aria-label': 'Generate Random Color',
                 onClick: () =>
                   updatePalette({ color: generateRandomColor(), index }),
+                asChild: false,
               },
             }}
           >
@@ -77,6 +79,7 @@ export const SwatchControls: React.FC<{
               props: {
                 'aria-label': 'Add New Swatch',
                 onClick: addSwatchBefore,
+                asChild: false,
               },
             }}
             className="p-2 text-sm"
