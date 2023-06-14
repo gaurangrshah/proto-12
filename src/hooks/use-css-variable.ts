@@ -1,29 +1,50 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-type CSSVariableHookResult = {
-  value: string | undefined;
-  ref: React.MutableRefObject<HTMLElement | null>;
-};
+type CSSVariableHookResult = [string | null, (newValue: string) => void];
 
-export const useCSSVariable = (variableName: string): CSSVariableHookResult => {
-  const ref = useRef<HTMLElement | null>(null);
-  const [value, setValue] = useState<string | undefined>(undefined);
+export const useCSSVariable = ({
+  variableName,
+  ref,
+  defaultValue,
+}: {
+  variableName: string;
+  ref?: React.RefObject<HTMLElement>;
+  defaultValue?: string;
+}): CSSVariableHookResult => {
+  const [value, setValue] = useState<string | null>(null);
+
+  const updateValue = (newValue: string) => {
+    const target = ref?.current || document.documentElement;
+    target.style.setProperty(variableName, newValue);
+  };
 
   useEffect(() => {
-    const handleResize = () => {
-      if (ref.current) {
-        const computedStyle = getComputedStyle(ref.current);
-        setValue(computedStyle.getPropertyValue(variableName).trim());
+    const handleVariableChange = (event: TransitionEvent | Event) => {
+      if (
+        event.target instanceof HTMLElement &&
+        event instanceof TransitionEvent &&
+        event.propertyName === variableName
+      ) {
+        setValue(event.target.style.getPropertyValue(variableName));
       }
     };
 
-    handleResize(); // Initial value
+    const target = ref?.current || document.documentElement;
+    target.addEventListener('transitionend', handleVariableChange);
+    target.addEventListener('DOMContentLoaded', handleVariableChange);
 
-    window.addEventListener('resize', handleResize);
     return () => {
-      window.removeEventListener('resize', handleResize);
+      target.removeEventListener('transitionend', handleVariableChange);
+      target.removeEventListener('DOMContentLoaded', handleVariableChange);
     };
-  }, [variableName]);
+  }, [variableName, ref]);
 
-  return { value, ref };
+  useEffect(() => {
+    const target = ref?.current || document.documentElement;
+    const computedValue =
+      getComputedStyle(target).getPropertyValue(variableName);
+    setValue(computedValue || defaultValue || null);
+  }, [variableName, ref, defaultValue]);
+
+  return [value, updateValue];
 };

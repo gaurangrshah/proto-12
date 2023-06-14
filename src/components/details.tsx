@@ -87,11 +87,7 @@ export const Details: React.FC<{ swatch: string }> = ({ swatch }) => {
   const ref = useRef<HTMLDivElement>(null);
 
   return (
-    <div
-      ref={ref}
-      className="mt-4 flex w-full items-center justify-center"
-      style={{ color: data?.contrast.value }}
-    >
+    <div ref={ref} className="mt-4 flex w-full items-center justify-center">
       <Popover
         btn={{
           label: !isLoading
