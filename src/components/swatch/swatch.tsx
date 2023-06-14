@@ -48,10 +48,7 @@ export const Swatch: React.FC<{
           className="z-[2] cursor-text p-1 font-dec text-5xl opacity-80 selection:bg-accent/30 selection:text-background/30"
           {...editableProps}
           onBlur={(e) => {
-            if (!e.currentTarget.textContent) {
-              e.currentTarget.textContent = replaced; // swatch.replace('#', '');
-            }
-            e.currentTarget.textContent.trim();
+            e.currentTarget.textContent = replaced; // swatch.replace('#', '');
           }}
           onClick={(e) => e.stopPropagation()}
         >
