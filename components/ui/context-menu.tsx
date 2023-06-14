@@ -259,9 +259,18 @@ export const CustomContextMenuSub: React.FC<{
       </ContextMenuSubTrigger>
       <ContextMenuSubContent>
         {sub?.length ? (
-          sub.map((item) => (
-            <CustomContextMenuItem key={item.label} item={item} />
-          ))
+          sub.map((item) =>
+            item?.sub && Array.isArray(item.sub) ? (
+              <CustomContextMenuSub
+                key={item.label}
+                sub={item.sub}
+                label={item.label}
+                icon={item.icon}
+              />
+            ) : (
+              <CustomContextMenuItem key={item.label} item={item} />
+            )
+          )
         ) : (
           <ContextMenuLabel>No Actions Available</ContextMenuLabel>
         )}
@@ -274,35 +283,53 @@ export const CustomContextMenuSub: React.FC<{
 export const CustomContextMenu: React.FC<
   ContextMenuProps & { swatch: string }
 > = ({ title, items, swatch, children, ...props }) => {
-  if (isDev) return <>{children}</>;
+  // if (isDev) return <>{children}</>;
+
+  function renderMenuItems(items: ContextMenuItem[]): React.ReactNode {
+    return items.map((item) => {
+      if (Array.isArray(item)) {
+        return renderMenuItems(item); // Recursively call the rendering function
+      } else {
+        // Render the menu item
+        return (
+          <CustomContextMenuSub
+            key={item.label}
+            label={item.label}
+            icon={item.icon}
+            sub={item.sub}
+          />
+        );
+      }
+    });
+  }
+
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
       <ContextMenuContent className="font-sans" {...props}>
-        <>
-          {title ? (
-            <>
-              <ContextMenuLabel
-                className="flex w-full justify-between"
-                style={{
-                  backgroundColor: swatch,
-                  color: getContrastColor(swatch ?? '#BADA55'),
-                }}
-              >
-                <p className="text-sm">{title}</p>
-                <p className="text-sm">{swatch}</p>
-              </ContextMenuLabel>
-              <ContextMenuSeparator />
-            </>
-          ) : null}
-          {items?.length ? (
-            items.map((item) => (
-              <CustomContextMenuItem key={item.label} item={item} />
-            ))
-          ) : (
-            <ContextMenuLabel>No Actions Available</ContextMenuLabel>
-          )}
-        </>
+        {title ? (
+          <>
+            <ContextMenuLabel
+              className="flex w-full justify-between"
+              style={{
+                backgroundColor: swatch,
+                color: getContrastColor(swatch ?? '#BADA55'),
+              }}
+            >
+              <p className="text-sm">{title}</p>
+              <p className="text-sm">{swatch}</p>
+            </ContextMenuLabel>
+            <ContextMenuSeparator />
+          </>
+        ) : null}
+        {items?.length ? (
+          // items.map((item) => (
+          //   <CustomContextMenuItem key={item.label} item={item} />
+          // ))
+          renderMenuItems(items)
+        ) : (
+          <ContextMenuLabel>No Actions Available</ContextMenuLabel>
+        )}
       </ContextMenuContent>
     </ContextMenu>
   );

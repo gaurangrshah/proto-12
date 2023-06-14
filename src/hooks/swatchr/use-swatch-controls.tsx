@@ -4,14 +4,21 @@ import {
   usePaletteState,
 } from '@/contexts/palette.context';
 import { generateRandomColor } from '@/utils';
-import { MinusCircleIcon, PaletteIcon, PlusCircleIcon } from 'lucide-react';
+import {
+  CheckIcon,
+  MinusCircleIcon,
+  PaletteIcon,
+  PlusCircleIcon,
+} from 'lucide-react';
 
 import { CircleIcon, DiceIcon } from '@/components/icons';
+
+import { useLocalStorage } from '../use-local-storage';
 
 export function useSwatchControls({ index }: { index: number }) {
   const { palette } = usePaletteState();
   const { updatePalette, removeSwatch, addSwatch } = usePaletteDispatch();
-
+  const [picker, setPicker] = useLocalStorage('picker', false);
   return useMemo(
     () => [
       {
@@ -30,7 +37,27 @@ export function useSwatchControls({ index }: { index: number }) {
               style={{ fill: color }}
             />
           ),
+          sub: [
+            {
+              label: 'Generate Random Color',
+              icon: <DiceIcon className="h-4 w-4 fill-current" />,
+              onClick: () => {
+                updatePalette({ index: i, color: generateRandomColor() });
+              },
+            },
+          ],
         })),
+      },
+      {
+        label: 'Toggle Picker',
+        icon: picker ? (
+          <CheckIcon className="h-4 w-4" />
+        ) : (
+          <CircleIcon className="stroke h-4 w-4 fill-transparent" />
+        ),
+        onClick: () => {
+          setPicker(!picker);
+        },
       },
       {
         label: 'Add Swatch Before',
