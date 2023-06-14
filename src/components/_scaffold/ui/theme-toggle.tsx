@@ -18,7 +18,7 @@ export function ThemeToggle() {
   return (
     <button
       aria-label="Color Mode Toggle"
-      className="btn btn-square bg alpha fixed right-6 top-10 z-10 rounded-md"
+      className="btn btn-square bg alpha rounded-md"
       onClick={() =>
         currentTheme == 'dark' ? setTheme('light') : setTheme('dark')
       }

@@ -5,7 +5,12 @@ import { ThemeProvider } from 'next-themes';
 
 import { ThemeToggle } from '../ui/theme-toggle';
 
-const BaseLayout: FCwChildren<WithSEO> = ({ title, description, children }) => {
+const BaseLayout: FCwChildren<WithSEO & { btns: React.ReactNode[] }> = ({
+  title,
+  description,
+  btns,
+  children,
+}) => {
   return (
     <ThemeProvider
       attribute="class"
@@ -14,7 +19,12 @@ const BaseLayout: FCwChildren<WithSEO> = ({ title, description, children }) => {
       // enableColorScheme
     >
       <NextSeo {...SEOConfig} title={title} description={description} />
-      <ThemeToggle />
+      <div className="fixed right-6 top-6 z-10 flex items-center justify-between gap-2">
+        {btns?.map((btn, i) => (
+          <div key={i}>{btn}</div>
+        ))}
+        <ThemeToggle />
+      </div>
       {children}
     </ThemeProvider>
   );

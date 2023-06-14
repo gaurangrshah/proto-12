@@ -3,11 +3,9 @@ import type { FCwChildren, WithSEO } from '@/types';
 import { bebas, inter } from '@/utils/fonts';
 import BaseLayout from './base.layout';
 
-export const DefaultLayout: FCwChildren<WithSEO & { full?: boolean }> = ({
-  full,
-  children,
-  ...props
-}) => {
+export const DefaultLayout: FCwChildren<
+  WithSEO & { full?: boolean; btns: React.ReactNode[] }
+> = ({ full, children, ...props }) => {
   return (
     <BaseLayout {...props}>
       <main

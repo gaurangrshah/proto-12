@@ -21,21 +21,27 @@ const EditorPage: React.FC<EditorProps> = ({ paletteString }) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <DefaultLayout full title="Palette Editor | Swatchr">
+      <DefaultLayout
+        full
+        title="Palette Editor | Swatchr"
+        btns={[
+          <button
+            key="reorder"
+            aria-label="reorder"
+            className={'btn btn-square bg alpha'}
+            onClick={() => setReorder(!reorder)}
+          >
+            <ArrowLeftRightIcon
+              size={20}
+              className={cn('text-foreground-invert', reorder && 'text-accent')}
+            />
+          </button>,
+          <Shortcuts key="shortcuts" className={`text-foreground-invert`} />,
+        ]}
+      >
         <PaletteProvider colors={paletteString}>
           <Palette reorder={reorder} />
         </PaletteProvider>
-        <Shortcuts className={`fixed right-16 top-10 text-foreground-invert`} />
-        <button
-          aria-label="reorder"
-          className={'btn btn-square bg alpha fixed right-24 top-10 mr-2'}
-          onClick={() => setReorder(!reorder)}
-        >
-          <ArrowLeftRightIcon
-            size={20}
-            className={cn('text-foreground-invert', reorder && 'text-accent')}
-          />
-        </button>
       </DefaultLayout>
     </QueryClientProvider>
   );
