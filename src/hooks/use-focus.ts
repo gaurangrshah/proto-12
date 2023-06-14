@@ -11,12 +11,13 @@ export function useFocus<T extends HTMLElement>(props: UseFocusProps) {
   const ref = useRef<T>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(() => {
     const storedIndex = localStorage.getItem('activeIndex');
-    return storedIndex ? parseInt(storedIndex, 10) : props.index;
+    return storedIndex ? parseInt(storedIndex, 10) : null;
   });
 
   const prevSiblingFocus = () => {
     const prevSibling = ref.current?.previousElementSibling as T;
     if (prevSibling) {
+      ref.current?.blur(); // Manually blur the current element
       setActiveIndex((prevIndex) => (prevIndex ? prevIndex - 1 : null));
       prevSibling.focus();
     } else {
@@ -38,6 +39,7 @@ export function useFocus<T extends HTMLElement>(props: UseFocusProps) {
   const nextSiblingFocus = () => {
     const nextSibling = ref.current?.nextElementSibling as T;
     if (nextSibling) {
+      ref.current?.blur(); // Manually blur the current element
       setActiveIndex((prevIndex) => (prevIndex ? prevIndex + 1 : null));
       nextSibling.focus();
     } else {
@@ -139,6 +141,12 @@ export function useFocus<T extends HTMLElement>(props: UseFocusProps) {
     props: {
       tabIndex: 0,
       ...otherProps,
+      onMouseEnter: (e: React.MouseEvent<HTMLDivElement>) => {
+        e.currentTarget.focus();
+      },
+      onMouseLeave: (e: React.MouseEvent<HTMLDivElement>) => {
+        e.currentTarget.blur();
+      },
     },
   };
 }
