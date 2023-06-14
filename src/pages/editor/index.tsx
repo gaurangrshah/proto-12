@@ -27,33 +27,18 @@ const EditorPage: React.FC<EditorProps> = ({ paletteString }) => {
         title="Palette Editor | Swatchr"
         btns={[
           <CustomTooltip
-            key="feedback"
-            trigger={{
-              Component: (
-                <MessageSquarePlusIcon
-                  size={18}
-                  className={cn(
-                    'text-foreground-invert',
-                    reorder && 'text-accent'
-                  )}
-                />
-              ),
-              props: {},
-            }}
-          >
-            Feedback
-          </CustomTooltip>,
-          <CustomTooltip
             key="reorder"
             trigger={{
               Component: (
-                <ArrowLeftRightIcon
-                  size={18}
-                  className={cn(
-                    'text-foreground-invert',
-                    reorder && 'text-accent'
-                  )}
-                />
+                <button className="btn btn-square bg alpha">
+                  <ArrowLeftRightIcon
+                    size={18}
+                    className={cn(
+                      'text-foreground-invert',
+                      reorder && 'text-accent'
+                    )}
+                  />
+                </button>
               ),
               props: {
                 onClick: () => setReorder(!reorder),
@@ -63,6 +48,25 @@ const EditorPage: React.FC<EditorProps> = ({ paletteString }) => {
             Feedback
           </CustomTooltip>,
           <Shortcuts key="shortcuts" className={`text-foreground-invert`} />,
+          <CustomTooltip
+            key="feedback"
+            trigger={{
+              Component: (
+                <button className="btn btn-square bg alpha">
+                  <MessageSquarePlusIcon
+                    size={18}
+                    className={cn(
+                      'text-foreground-invert',
+                      reorder && 'text-accent'
+                    )}
+                  />
+                </button>
+              ),
+              props: {},
+            }}
+          >
+            Feedback
+          </CustomTooltip>,
         ]}
       >
         <PaletteProvider colors={paletteString}>

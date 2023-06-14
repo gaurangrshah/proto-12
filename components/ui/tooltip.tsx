@@ -38,7 +38,6 @@ export type TooltipProps = {
   trigger: {
     Component: React.ReactNode;
     props: React.ComponentPropsWithoutRef<typeof Trigger>;
-    unset?: boolean;
   };
   children: React.ReactNode;
   offset?: number;
@@ -53,10 +52,8 @@ export const CustomTooltip: React.FC<TooltipProps> = ({
   return (
     <Tooltip.Provider>
       <Tooltip.Root>
-        <Tooltip.Trigger
-          className={`${trigger.unset ? '' : 'btn bg alpha'}`}
-          {...trigger.props}
-        >
+        {/* @NOTE: triger defaults to child, but can be overridden via trigger props */}
+        <Tooltip.Trigger className="btn bg alpha" asChild {...trigger.props}>
           {trigger.Component}
         </Tooltip.Trigger>
         <Tooltip.Content className="p-2 text-sm" sideOffset={offset} {...props}>
