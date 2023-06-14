@@ -1,4 +1,5 @@
 import { Popover } from '@headlessui/react';
+import { CustomTooltip } from 'components/ui/tooltip';
 
 const SHORTCUT_MODIFIERS = {
   alt: '⌥',
@@ -88,17 +89,25 @@ export const Shortcuts = (props: React.ComponentProps<'div'>) => {
   return (
     <div {...props}>
       <Popover className="relative">
-        <Popover.Button className="btn btn-square bg alpha">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
-            viewBox="0 0 256 256"
-            className="h-5 w-5 fill-current"
-          >
-            <path d="M223.51,48h-191A16.51,16.51,0,0,0,16,64.49v127A16.51,16.51,0,0,0,32.49,208h191A16.51,16.51,0,0,0,240,191.51v-127A16.51,16.51,0,0,0,223.51,48ZM224,191.51a.49.49,0,0,1-.49.49h-191a.49.49,0,0,1-.49-.49v-127a.49.49,0,0,1,.49-.49h191a.49.49,0,0,1,.49.49ZM208,128a8,8,0,0,1-8,8H56a8,8,0,0,1,0-16H200A8,8,0,0,1,208,128Zm0-32a8,8,0,0,1-8,8H56a8,8,0,0,1,0-16H200A8,8,0,0,1,208,96ZM72,160a8,8,0,0,1-8,8H56a8,8,0,0,1,0-16h8A8,8,0,0,1,72,160Zm96,0a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,160Zm40,0a8,8,0,0,1-8,8h-8a8,8,0,0,1,0-16h8A8,8,0,0,1,208,160Z"></path>
-          </svg>
-        </Popover.Button>
+        <CustomTooltip
+          trigger={{
+            Component: (
+              <Popover.Button className="btn bg alpha">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 256 256"
+                  className="h-5 w-5 fill-current"
+                >
+                  <path d="M223.51,48h-191A16.51,16.51,0,0,0,16,64.49v127A16.51,16.51,0,0,0,32.49,208h191A16.51,16.51,0,0,0,240,191.51v-127A16.51,16.51,0,0,0,223.51,48ZM224,191.51a.49.49,0,0,1-.49.49h-191a.49.49,0,0,1-.49-.49v-127a.49.49,0,0,1,.49-.49h191a.49.49,0,0,1,.49.49ZM208,128a8,8,0,0,1-8,8H56a8,8,0,0,1,0-16H200A8,8,0,0,1,208,128Zm0-32a8,8,0,0,1-8,8H56a8,8,0,0,1,0-16H200A8,8,0,0,1,208,96ZM72,160a8,8,0,0,1-8,8H56a8,8,0,0,1,0-16h8A8,8,0,0,1,72,160Zm96,0a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,160Zm40,0a8,8,0,0,1-8,8h-8a8,8,0,0,1,0-16h8A8,8,0,0,1,208,160Z" />
+                </svg>
+              </Popover.Button>
+            ),
+            props: {},
+            unset: true,
+          }}
+        >
+          Keyboard Shortcuts
+        </CustomTooltip>
         <Popover.Panel className="absolute z-10 w-64 -translate-x-[calc(100%-30px)] rounded-md bg-white p-4 text-foreground shadow-lg dark:bg-gray-800">
           <h3 className="mb-3 text-base font-bold text-foreground/30">
             Keyboard Shortcuts

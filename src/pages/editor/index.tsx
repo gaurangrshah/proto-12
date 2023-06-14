@@ -3,8 +3,9 @@ import type { GetServerSideProps } from 'next';
 import { PaletteProvider } from '@/contexts/palette.context';
 import { queryClient } from '@/utils';
 import { QueryClientProvider } from '@tanstack/react-query';
+import { CustomTooltip } from 'components/ui/tooltip';
 import { cn } from 'lib/utils';
-import { ArrowLeftRightIcon } from 'lucide-react';
+import { ArrowLeftRightIcon, MessageSquarePlusIcon } from 'lucide-react';
 
 import { DefaultLayout } from '@/components/_scaffold/layouts';
 import { Palette } from '@/components/palette';
@@ -25,17 +26,42 @@ const EditorPage: React.FC<EditorProps> = ({ paletteString }) => {
         full
         title="Palette Editor | Swatchr"
         btns={[
-          <button
-            key="reorder"
-            aria-label="reorder"
-            className={'btn btn-square bg alpha'}
-            onClick={() => setReorder(!reorder)}
+          <CustomTooltip
+            key="feedback"
+            trigger={{
+              Component: (
+                <MessageSquarePlusIcon
+                  size={18}
+                  className={cn(
+                    'text-foreground-invert',
+                    reorder && 'text-accent'
+                  )}
+                />
+              ),
+              props: {},
+            }}
           >
-            <ArrowLeftRightIcon
-              size={20}
-              className={cn('text-foreground-invert', reorder && 'text-accent')}
-            />
-          </button>,
+            Feedback
+          </CustomTooltip>,
+          <CustomTooltip
+            key="reorder"
+            trigger={{
+              Component: (
+                <ArrowLeftRightIcon
+                  size={18}
+                  className={cn(
+                    'text-foreground-invert',
+                    reorder && 'text-accent'
+                  )}
+                />
+              ),
+              props: {
+                onClick: () => setReorder(!reorder),
+              },
+            }}
+          >
+            Feedback
+          </CustomTooltip>,
           <Shortcuts key="shortcuts" className={`text-foreground-invert`} />,
         ]}
       >

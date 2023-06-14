@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { MoonIcon, SunIcon } from '@heroicons/react/24/outline';
+import { CustomTooltip } from 'components/ui/tooltip';
 import { useTheme } from 'next-themes';
 
 export function ThemeToggle() {
@@ -16,27 +17,34 @@ export function ThemeToggle() {
   if (!mounted) return null;
 
   return (
-    <button
+    <CustomTooltip
       aria-label="Color Mode Toggle"
-      className="btn btn-square bg alpha rounded-md"
       onClick={() =>
         currentTheme == 'dark' ? setTheme('light') : setTheme('dark')
       }
+      trigger={{
+        Component:
+          theme === 'light' ? (
+            <MoonIcon
+              className={`h-5 w-5 stroke-foreground-invert transition-opacity ${
+                currentTheme === 'dark' ? 'fade-out' : 'fade-in'
+              }`}
+              strokeWidth={1}
+            />
+          ) : (
+            <SunIcon
+              className={`h-5 w-5 stroke-foreground-invert transition-opacity ${
+                currentTheme === 'light' ? 'fade-out' : 'fade-in'
+              }`}
+            />
+          ),
+        props: {
+          onClick: () =>
+            currentTheme == 'dark' ? setTheme('light') : setTheme('dark'),
+        },
+      }}
     >
-      {theme === 'light' ? (
-        <MoonIcon
-          className={`h-5 w-5 stroke-foreground-invert transition-opacity ${
-            currentTheme === 'dark' ? 'fade-out' : 'fade-in'
-          }`}
-          strokeWidth={1}
-        />
-      ) : (
-        <SunIcon
-          className={`h-5 w-5 stroke-foreground-invert transition-opacity ${
-            currentTheme === 'light' ? 'fade-out' : 'fade-in'
-          }`}
-        />
-      )}
-    </button>
+      Color Mode
+    </CustomTooltip>
   );
 }
