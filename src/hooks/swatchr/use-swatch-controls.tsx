@@ -13,16 +13,59 @@ import {
 
 import { CircleIcon, DiceIcon } from '@/components/icons';
 
-import { useLocalStorage } from '../use-local-storage';
-
 export function useSwatchControls({ index }: { index: number }) {
   const { palette } = usePaletteState();
   const { updatePalette, removeSwatch, addSwatch } = usePaletteDispatch();
-  const [picker, setPicker] = useLocalStorage('picker', false);
-  return useMemo(
+
+  const paletteManagement = useMemo(
+    () => [
+      'Palette Management',
+      [
+        {
+          label: 'Add Swatch Before',
+          icon: <PlusCircleIcon className="h-4 w-4" />,
+          onClick: () => {
+            addSwatch(index);
+          },
+        },
+        {
+          label: 'Add Swatch After',
+          icon: <PlusCircleIcon className="h-4 w-4" />,
+          onClick: () => {
+            addSwatch(index + 1);
+          },
+        },
+      ],
+    ],
+    [addSwatch, index]
+  );
+
+  const swatchActions = useMemo(
+    () => [
+      'Swatch Actions',
+      [
+        {
+          label: 'Remove Swatch',
+          icon: <MinusCircleIcon className="h-4 w-4" />,
+          onClick: () => removeSwatch(index),
+        },
+        {
+          label: 'Generate Random Color',
+          icon: <DiceIcon className="h-4 w-4 fill-current" />,
+          onClick: () => {
+            updatePalette({ index, color: generateRandomColor() });
+          },
+          shortcut: 'space',
+        },
+      ],
+    ],
+    [index, updatePalette, removeSwatch]
+  );
+
+  const paletteActions = useMemo(
     () => [
       {
-        label: 'Palette',
+        label: 'Swatches',
         icon: <PaletteIcon className="h-4 w-4" />,
         sub: palette?.map((color, i) => ({
           label: `Swatch ${i + 1}`,
@@ -45,50 +88,22 @@ export function useSwatchControls({ index }: { index: number }) {
                 updatePalette({ index: i, color: generateRandomColor() });
               },
             },
+            {
+              label: 'Remove Swatch',
+              icon: <MinusCircleIcon className="h-4 w-4" />,
+              onClick: () => {
+                removeSwatch(index);
+              },
+            },
           ],
         })),
       },
-      {
-        label: 'Toggle Picker',
-        icon: picker ? (
-          <CheckIcon className="h-4 w-4" />
-        ) : (
-          <CircleIcon className="stroke h-4 w-4 fill-transparent" />
-        ),
-        onClick: () => {
-          setPicker(!picker);
-        },
-      },
-      {
-        label: 'Add Swatch Before',
-        icon: <PlusCircleIcon className="h-4 w-4" />,
-        onClick: () => {
-          addSwatch(index);
-        },
-      },
-      {
-        label: 'Add Swatch After',
-        icon: <PlusCircleIcon className="h-4 w-4" />,
-        onClick: () => {
-          addSwatch(index + 1);
-        },
-      },
-      {
-        label: 'Remove Swatch',
-        icon: <MinusCircleIcon className="h-4 w-4" />,
-        onClick: () => {
-          removeSwatch(index);
-        },
-      },
-      {
-        label: 'Generate Random Color',
-        icon: <DiceIcon className="h-4 w-4 fill-current" />,
-        onClick: () => {
-          updatePalette({ index, color: generateRandomColor() });
-        },
-        shortcut: 'space',
-      },
     ],
-    [palette, index, addSwatch, removeSwatch, updatePalette]
+    [palette, index, removeSwatch, updatePalette]
+  );
+
+  return useMemo(
+    () => [swatchActions, paletteManagement, paletteActions],
+    [swatchActions, paletteManagement, paletteActions]
   );
 }

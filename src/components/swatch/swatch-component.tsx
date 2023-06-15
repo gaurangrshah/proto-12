@@ -5,7 +5,10 @@ import {
 } from '@/contexts/palette.context';
 import { useFocus, useKeyboardShortcut } from '@/hooks';
 import { generateRandomColor, getContrastColor } from '@/utils';
-import { CustomContextMenu } from 'components/ui/context-menu';
+import {
+  ContextMenuItemsTuple,
+  CustomContextMenu,
+} from 'components/ui/context-menu';
 import { motion, useAnimation } from 'framer-motion';
 
 import { useSwatchControls } from '@/hooks/swatchr/use-swatch-controls';
@@ -122,7 +125,7 @@ export const SwatchWrapper = ({
       onMouseLeave={resetOnLeave}
     >
       <CustomContextMenu
-        items={swatchControls}
+        items={swatchControls as ContextMenuItemsTuple[]}
         title="Swatch Menu"
         swatch={swatch}
       >

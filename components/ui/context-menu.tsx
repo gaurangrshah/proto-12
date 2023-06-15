@@ -211,9 +211,11 @@ export type ContextMenuItem = {
 };
 
 export type ContextMenuProps = {
-  items: ContextMenuItem[];
+  items: ContextMenuItem[] | ContextMenuItemsTuple[];
   children: React.ReactNode;
 } & React.ComponentPropsWithoutRef<typeof ContextMenuContent>;
+
+export type ContextMenuItemsTuple = [string, ContextMenuItem[]];
 
 export const CustomContextMenuItem: React.FC<{ item: ContextMenuItem }> = ({
   item,
@@ -253,7 +255,7 @@ export const CustomContextMenuSub: React.FC<{
       <ContextMenuSubTrigger>
         {icon ? <div className="mr-4">{icon}</div> : null}
         {label}
-        <div className="ml-auto pl-5 text-current group-data-[disabled]:text-current group-data-[highlighted]:text-current">
+        <div className="ml-auto pl-5 text-xs text-current group-data-[disabled]:text-current group-data-[highlighted]:text-current ">
           <ChevronRightIcon />
         </div>
       </ContextMenuSubTrigger>
@@ -285,27 +287,51 @@ export const CustomContextMenu: React.FC<
 > = ({ title, items, swatch, children, ...props }) => {
   // if (isDev) return <>{children}</>;
 
-  function renderMenuItems(items: ContextMenuItem[]): React.ReactNode {
-    return items.map((item) => {
-      if (Array.isArray(item)) {
-        return renderMenuItems(item); // Recursively call the rendering function
-      } else {
-        // Render the menu item
-        return (
-          <CustomContextMenuSub
-            key={item.label}
-            label={item.label}
-            icon={item.icon}
-            sub={item.sub}
-          />
-        );
-      }
-    });
+  function renderMenuItems(
+    items: (ContextMenuItem | ContextMenuItem[])[]
+  ): React.ReactNode {
+    return (
+      items?.length &&
+      items.map((item, index) => {
+        if (Array.isArray(item)) {
+          return renderMenuItems(item);
+        } else if (typeof item === 'string') {
+          return (
+            <>
+              <ContextMenuLabel
+                className="flex w-full justify-between text-xs"
+                style={{
+                  backgroundColor: 'rgba(255,255,255, 0.2)',
+                  color: getContrastColor(swatch ?? '#BADA55'),
+                }}
+              >
+                {item}
+              </ContextMenuLabel>
+              <ContextMenuSeparator className="text-black" />
+            </>
+          );
+        } else if (item?.sub) {
+          return (
+            <CustomContextMenuSub
+              key={`${item.label}-${index}`}
+              label={item.label}
+              icon={item.icon}
+              sub={item.sub}
+            />
+          );
+        } else {
+          return (
+            <CustomContextMenuItem key={`${item.label}-${index}`} item={item} />
+          );
+        }
+      })
+    );
   }
 
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
+
       <ContextMenuContent className="font-sans" {...props}>
         {title ? (
           <>
@@ -326,7 +352,7 @@ export const CustomContextMenu: React.FC<
           // items.map((item) => (
           //   <CustomContextMenuItem key={item.label} item={item} />
           // ))
-          renderMenuItems(items)
+          renderMenuItems(items as (ContextMenuItem | ContextMenuItem[])[])
         ) : (
           <ContextMenuLabel>No Actions Available</ContextMenuLabel>
         )}
