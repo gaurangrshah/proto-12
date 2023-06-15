@@ -66,7 +66,7 @@ export function useFocus<T extends HTMLElement>(props: UseFocusProps) {
   }, [props.index]);
 
   const handleBlur = useCallback(() => {
-    setActiveIndex(0);
+    setActiveIndex(null);
   }, []);
 
   const handleMouseEnter = useCallback(() => {
