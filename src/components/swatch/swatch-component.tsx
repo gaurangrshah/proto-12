@@ -8,6 +8,7 @@ import { generateRandomColor, getContrastColor } from '@/utils';
 import {
   ContextMenuItemsTuple,
   CustomContextMenu,
+  type ContextMenuItemsTuple,
 } from 'components/ui/context-menu';
 import { motion, useAnimation } from 'framer-motion';
 
@@ -121,17 +122,17 @@ export const SwatchWrapper = ({
     <div
       ref={ref}
       {...focusProps}
-      className="w-full md:h-screen"
+      className="relative w-full"
       onMouseLeave={resetOnLeave}
     >
-      <CustomContextMenu
-        items={swatchControls as ContextMenuItemsTuple[]}
-        title="Swatch Menu"
-        swatch={swatch}
+      <motion.div
+        animate={animation}
+        className="flex h-full w-full flex-1 flex-col items-center justify-center focus:outline-none"
       >
-        <motion.div
-          animate={animation}
-          className="flex h-full w-full flex-1 flex-col items-center justify-center focus:outline-none"
+        <CustomContextMenu
+          items={swatchControls as ContextMenuItemsTuple[]}
+          title="Swatch Menu"
+          swatch={swatch}
         >
           <div onClick={() => setPicker(!picker)}>
             {!reorder && picker && (
@@ -144,12 +145,8 @@ export const SwatchWrapper = ({
             )}
             {children({ swatch, updateColor })}
           </div>
-          {!reorder && <Details swatch={swatch} />}
-          {controls?.isActive && (
-            <SwatchControls palette={palette} index={index} reorder={reorder} />
-          )}
-        </motion.div>
-      </CustomContextMenu>
+        </CustomContextMenu>
+        {!reorder && <Details swatch={swatch} />}
     </div>
   );
 };
