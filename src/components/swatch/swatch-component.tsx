@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   usePaletteDispatch,
   usePaletteState,
@@ -6,7 +6,6 @@ import {
 import { useFocus, useKeyboardShortcut } from '@/hooks';
 import { generateRandomColor, getContrastColor } from '@/utils';
 import {
-  ContextMenuItemsTuple,
   CustomContextMenu,
   type ContextMenuItemsTuple,
 } from 'components/ui/context-menu';
@@ -85,11 +84,20 @@ export const SwatchWrapper = ({
 
   const [picker, setPicker] = useLocalStorage('picker', false);
 
+  const [showControls, setShowControls] = useState<boolean>(false);
+
   const {
     ref,
     controls,
     props: focusProps,
   } = useFocus<HTMLDivElement>({ index });
+
+  useEffect(() => {
+    setTimeout(() => {
+      // used to retain focus on the SwatchControls when clicked
+      setShowControls(controls?.isActive);
+    }, 150);
+  }, [controls?.isActive]);
 
   const updateColor = ({ color }: { color: string }) => {
     updatePalette({ index, color });
@@ -147,6 +155,12 @@ export const SwatchWrapper = ({
           </div>
         </CustomContextMenu>
         {!reorder && <Details swatch={swatch} />}
+      </motion.div>
+      {showControls && (
+        <div className="absolute z-10 flex w-full items-center justify-center">
+          <SwatchControls palette={palette} index={index} reorder={reorder} />
+        </div>
+      )}
     </div>
   );
 };

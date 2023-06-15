@@ -32,20 +32,24 @@ export const SwatchControls: React.FC<{
         <div className="absolute bottom-48 z-[1] flex flex-row gap-3">
           <CustomTooltip
             trigger={{
-              Component:
-                palette && palette?.length > 1 ? (
-                  <MinusCircleIcon className="w-5" strokeWidth={2} />
-                ) : (
-                  <XCircleIcon
-                    className="w-6 text-destructive"
-                    strokeWidth={2}
-                  />
-                ),
-              props: {
-                'aria-label': 'Add New Swatch',
-                onClick: removeCurrentSwatch,
-                asChild: false,
-              },
+              Component: (
+                <button
+                  aria-label="Remove Swatch"
+                  onClick={() => {
+                    removeCurrentSwatch();
+                  }}
+                >
+                  {palette && palette?.length > 1 ? (
+                    <MinusCircleIcon className="w-5" strokeWidth={2} />
+                  ) : (
+                    <XCircleIcon
+                      className="w-6 text-destructive"
+                      strokeWidth={2}
+                    />
+                  )}
+                </button>
+              ),
+              props: {},
             }}
             className="p-2 text-sm"
           >
@@ -56,14 +60,16 @@ export const SwatchControls: React.FC<{
           <CustomTooltip
             trigger={{
               Component: (
-                <DiceIcon className="w-5 fill-current" strokeWidth={2} />
+                <button
+                  aria-label="Generate Random Color"
+                  onClick={() => {
+                    updatePalette({ color: generateRandomColor(), index });
+                  }}
+                >
+                  <DiceIcon className="w-5 fill-current" strokeWidth={2} />
+                </button>
               ),
-              props: {
-                'aria-label': 'Generate Random Color',
-                onClick: () =>
-                  updatePalette({ color: generateRandomColor(), index }),
-                asChild: false,
-              },
+              props: {},
             }}
           >
             <div className="flex">
@@ -75,14 +81,18 @@ export const SwatchControls: React.FC<{
           </CustomTooltip>
           <CustomTooltip
             trigger={{
-              Component: <PlusCircleIcon className="w-5" strokeWidth={2} />,
-              props: {
-                'aria-label': 'Add New Swatch',
-                onClick: addSwatchBefore,
-                asChild: false,
-              },
+              Component: (
+                <button
+                  aria-label="Add New Swatch"
+                  onClick={() => {
+                    addSwatchBefore();
+                  }}
+                >
+                  <PlusCircleIcon className="h-5 w-5" strokeWidth={2} />
+                </button>
+              ),
+              props: {},
             }}
-            className="p-2 text-sm"
           >
             <div className="flex">
               <p>Add Swatch</p>
