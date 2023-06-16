@@ -131,7 +131,7 @@ export const SwatchWrapper = ({
     <div
       ref={ref}
       {...focusProps}
-      className="relative w-full"
+      className="relative h-full w-full"
       onMouseLeave={resetOnLeave}
     >
       <motion.div
