@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { useClickOutside } from '@/hooks';
+import { XCircleIcon } from 'lucide-react';
 import { HexColorPicker } from 'react-colorful';
 
 export function Pickers({
@@ -20,12 +21,20 @@ export function Pickers({
   return (
     <div
       ref={pickerWrapperRef}
-      className="absolute z-20 flex h-56 w-56 flex-col items-center justify-center"
+      className="absolute z-20 flex h-56 w-56 flex-col items-center justify-center overflow-hidden"
       onClick={(e) => e.stopPropagation()}
       onMouseDown={(e) => e.stopPropagation()}
       onMouseUp={(e) => e.stopPropagation()}
     >
-      <HexColorPicker color={swatch} onChange={onChange} />
+      <div className="flex-center relative h-full w-full">
+        <button
+          className="btn btn-round bg alpha absolute right-0 top-0 z-10"
+          onClick={onClose}
+        >
+          <XCircleIcon size={16} color="white" />
+        </button>
+        <HexColorPicker color={swatch} onChange={onChange} />
+      </div>
     </div>
   );
 }
