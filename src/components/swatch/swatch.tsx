@@ -9,6 +9,7 @@ export const Swatch: React.FC<{
     onEnter: (e: React.KeyboardEvent<HTMLDivElement>) => {
       e.preventDefault();
       e.stopPropagation();
+      console.log('enter', e.currentTarget.textContent?.trim());
       const newColor = '#' + e.currentTarget.textContent?.trim();
       if (!newColor || newColor === swatch) return;
       updateColor({
@@ -17,7 +18,7 @@ export const Swatch: React.FC<{
     },
   });
 
-  const replaced = swatch.replace('#', '');
+  const strippedHex = swatch.replace('#', '');
 
   const handleBlur = () => {
     if (!isBrowser) return;
@@ -44,15 +45,18 @@ export const Swatch: React.FC<{
           role="textbox"
           contentEditable={true}
           suppressContentEditableWarning={true}
-          data-placeholder={replaced}
+          data-placeholder={strippedHex}
           className="z-[2] cursor-text p-1 font-dec text-5xl opacity-80 selection:bg-accent/30 selection:text-background/30"
           {...editableProps}
           onBlur={(e) => {
-            e.currentTarget.textContent = replaced; // swatch.replace('#', '');
+            if (!e.currentTarget.textContent) {
+              // reset to original value
+              e.currentTarget.textContent = strippedHex;
+            }
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          {replaced}
+          {strippedHex}
         </div>
       </div>
     </motion.div>
