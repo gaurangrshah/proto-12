@@ -10,6 +10,7 @@ import {
   type ContextMenuItemsTuple,
 } from 'components/ui/context-menu';
 import { motion, useAnimation } from 'framer-motion';
+import { cn } from 'lib/utils';
 
 import { useSwatchControls } from '@/hooks/swatchr/use-swatch-controls';
 import { useDebounce } from '@/hooks/use-debounce';
@@ -156,11 +157,14 @@ export const SwatchWrapper = ({
         </CustomContextMenu>
         {!reorder && <Details swatch={swatch} />}
       </motion.div>
-      {showControls && (
-        <div className="absolute z-10 flex w-full items-center justify-center">
-          <SwatchControls palette={palette} index={index} reorder={reorder} />
-        </div>
-      )}
+      <div
+        className={cn(
+          'absolute z-10 flex w-full items-center justify-center',
+          showControls ? 'visible' : 'hidden'
+        )}
+      >
+        <SwatchControls palette={palette} index={index} reorder={reorder} />
+      </div>
     </div>
   );
 };
