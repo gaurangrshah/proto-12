@@ -1,5 +1,6 @@
+import { useRef } from 'react';
 import { usePaletteDispatch } from '@/contexts/palette.context';
-import { generateRandomColor } from '@/utils';
+import { generateRandomColor, getContrastColor } from '@/utils';
 import {
   MinusCircleIcon,
   PlusCircleIcon,
@@ -17,6 +18,8 @@ export const SwatchControls: React.FC<{
   const { updatePalette, addSwatch, removeSwatch } = usePaletteDispatch();
   const addSwatchBefore = () => addSwatch(index + 1);
   const removeCurrentSwatch = () => removeSwatch(index);
+  const ref = useRef<HTMLDivElement>(null);
+  const contrast = getContrastColor(palette ? String(palette[index]) : '#000');
 
   return (
     <>
@@ -29,7 +32,11 @@ export const SwatchControls: React.FC<{
           <CircleIcon className="h-4 w-4 rounded-full bg-current opacity-30" />
         </div>
       ) : (
-        <div className="absolute bottom-48 z-[1] flex flex-row gap-3">
+        <div
+          ref={ref}
+          className={`absolute bottom-48 z-[1] flex flex-row gap-3`}
+          style={{ color: contrast }}
+        >
           <CustomTooltip
             trigger={{
               Component: (

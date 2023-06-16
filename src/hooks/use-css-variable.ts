@@ -2,15 +2,11 @@ import { useEffect, useState } from 'react';
 
 type CSSVariableHookResult = [string | null, (newValue: string) => void];
 
-export const useCSSVariable = ({
-  variableName,
-  ref,
-  defaultValue,
-}: {
-  variableName: string;
-  ref?: React.RefObject<HTMLElement>;
-  defaultValue?: string;
-}): CSSVariableHookResult => {
+export const useCSSVariable = (
+  variableName: string,
+  defaultValue?: string,
+  ref?: React.RefObject<HTMLElement>
+): CSSVariableHookResult => {
   const [value, setValue] = useState<string | null>(null);
 
   const updateValue = (newValue: string) => {
