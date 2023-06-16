@@ -310,7 +310,7 @@
     @apply border border-[var(--bg)] bg-transparent text-[var(--bg)];
   } */
   .btn-round {
-    @apply rounded-full py-5;
+    @apply rounded-full p-1;
   }
   .btn-square {
     @apply px-2 py-2;
