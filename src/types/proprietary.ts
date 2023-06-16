@@ -10,7 +10,7 @@ export type WithSEO = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FCwChildren<T = Record<string, any> | undefined> = FC<
-  { children: React.ReactNode } & Partial<T>
+  { children: React.ReactNode } & T
 >;
 
 export type NextPageWithAuth = NextPage & { auth: boolean };
