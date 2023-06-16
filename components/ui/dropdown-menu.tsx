@@ -201,17 +201,33 @@ export {
   DropdownMenuRadioGroup,
 };
 
-export const CustomDropDownMenu: FCwChildren<
-  (typeof DropdownMenu)['defaultProps']
-> = ({ children, ...props }) => {
+export const CustomDropdownMenu: FCwChildren<
+  {
+    trigger: {
+      Component: React.ReactNode;
+      props: React.ComponentPropsWithoutRef<typeof DropdownMenuTrigger>;
+    };
+  } & (typeof DropdownMenu)['defaultProps']
+> = ({ children, trigger, ...props }) => {
   return (
     <DropdownMenu {...props}>
-      <DropdownMenuTrigger asChild>
-        <div className="h-6 w-6">
-          <MoreVerticalIcon className="h-5 w-5 cursor-pointer" />
-        </div>
+      <DropdownMenuTrigger asChild {...trigger.props}>
+        {trigger?.Component}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">{children}</DropdownMenuContent>
     </DropdownMenu>
+  );
+};
+
+export const DropdownItems: FCwChildren<{ label: string }> = ({
+  label,
+  children,
+}) => {
+  return (
+    <>
+      <DropdownMenuLabel>{label}</DropdownMenuLabel>
+      <DropdownMenuSeparator />
+      {children}
+    </>
   );
 };
