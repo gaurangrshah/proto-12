@@ -109,7 +109,7 @@
   }
 
   .bg {
-    @apply bg-[var(--bg)] text-[var(--text)] disabled:bg-[var(--muted-bg)] disabled:text-[var(--muted-text)];
+    @apply bg-[var(--bg)] text-[var(--text)] disabled:bg-[var(--bg-muted)] disabled:text-[var(--text-muted)];
   }
 
   .muted {
@@ -314,6 +314,17 @@
   }
   .btn-square {
     @apply px-2 py-2;
+  }
+
+  .nav-link {
+    @apply inline-block list-none px-2 py-2 text-[var(--text)] transition-all duration-300 ease-in hover:text-[var(--text-focus)];
+  }
+  a.nav-link {
+    @apply list-none;
+  }
+
+  .link {
+    @apply inline-block text-[var(--text-muted)] transition-all duration-300 ease-in hover:text-[var(--text-focus)];
   }
 }
 
