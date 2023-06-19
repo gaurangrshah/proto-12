@@ -2980,7 +2980,93 @@ export const config = {
 
 ```
 
-- [ ] notion as database? 
+- [ ] [notion-api](https://developers.notion.com/) as database? 
+
+	1. [Create a new notion integration](https://www.notion.so/my-integrations).
+
+    	1. name the integration appropriately (you'll need this in step #5)
+    	2. Be sure to select the correct workspace
+    	3. get your credentials
+
+	2. save credts to .env (NOTION_API_KEY=)
+
+	3. install [notion client](https://github.com/makenotion/notion-sdk-js)
+
+    1. ```
+       yarn add @notionhq/client
+       ```
+
+	4. setup a new database (table) in the same workspace you chose
+
+    	1. Don't forget to name your database appropriately.
+    	2. Add a few records and setup your fields.
+
+	5. Complete integration linking with database via share btn
+
+    	1. Invite the integration you created (in step #1) to your database page
+    	2. Ensure that the integration has "can edit " privileges
+    	3. Copy your notion id from the URL [share] -> [copy link]
+        	1. Your id appears directly after the domain in the URL
+
+	6. Add database id to .env (NOTION_DATABASE_ID=)
+
+**WORKING WITH TABLES**
+
+```tsx
+import { Client } from "@notionhq/client"
+
+export default function Page({results}) {
+  return <div>{results[0].properties.Name.title[0].plain_text}</div>
+}
+
+export async function getStaticProps() {
+	const notion = new Client({ auth: process.env.NOTION_API_KEY })
+  
+  const response = await notion.database.query({
+    database_id: process.env.NOTION_DATABASE_ID
+  })
+  
+  return {
+    props: {
+      results: response.results,
+    }
+  }
+}
+```
+
+
+
+7. Get ID to individual pages from URL to work with blocks. 
+   1. Make sure the page is shared with the integration as well.
+
+**WORKING WITH BLOCKS**
+
+```tsx
+import { Client } from "@notionhq/client"
+
+export default function Page({data}) {
+  return <div>{data[0].paragraph.text[0].plain_text}</div>
+}
+
+export async function getStaticProps() {
+	const notion = new Client({ auth: process.env.NOTION_API_KEY })
+  
+  const blockId = 'adofjawoiejfaowjiefiawjefawefoij'
+  const response = await notion.blocks.children.list({
+    block_id: blockId,
+    page_size: 50
+  })
+  
+  return {
+    props: {
+      data: response,
+    }
+  }
+}
+```
+
+
+
 - [ ] compare redis vs. react-query (limitations, etc...)
 - [ ] [multi-tenancy](https://vercel.com/guides/nextjs-multi-tenant-application)
 - [ ] [CVA](https://cva.style/docs) + [CLSX](https://github.com/lukeed/clsx)

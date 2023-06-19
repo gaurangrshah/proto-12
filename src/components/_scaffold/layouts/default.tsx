@@ -1,7 +1,7 @@
 import type { FCwChildren, WithSEO } from '@/types';
 
 import { bebas, inter } from '@/utils/fonts';
-import BaseLayout from './base.layout';
+import BaseLayout from './base';
 
 export const DefaultLayout: FCwChildren<
   WithSEO & { full?: boolean; btns: React.ReactNode[] }

@@ -115,6 +115,7 @@ export default {
   },
   plugins: [
     require('@tailwindcss/typography'),
+    require('@tailwindcss/forms'),
     require('tailwindcss-animate'),
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     require('@headlessui/tailwindcss')({ prefix: 'ui' }),
