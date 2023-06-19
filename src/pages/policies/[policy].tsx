@@ -14,7 +14,7 @@ const PolicyPage: NextPage<{ content: string; policy: string }> = ({
   content,
 }) => {
   return (
-    <DefaultLayout>
+    <DefaultLayout btns={[]}>
       <div className="prose prose-xl">
         {content ? <Markdown options={options}>{content}</Markdown> : null}
       </div>

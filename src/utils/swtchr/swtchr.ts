@@ -1,19 +1,5 @@
 import tinycolor from 'tinycolor2';
 
-export const convertPalette = {
-  stringify: (arr: string[]) => {
-    try {
-      return arr.join('-').replace(/#/g, '');
-    } catch (error) {
-      console.error(error);
-    }
-  },
-  parse: (str: string) => {
-    const hexList = str?.split('-') ?? [];
-    return hexList.map((hex) => '#' + hex);
-  },
-};
-
 export const generateRandomColor = (): string => {
   const letters = '0123456789ABCDEF';
   let color = '#';
@@ -36,6 +22,47 @@ export function rgbToHex(color: [number, number, number]) {
   return `#${r.toString(16).padStart(2, '0')}${g
     .toString(16)
     .padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
+
+export function getTextMode(
+  colors: string[],
+  background: string
+): string | null {
+  const bg = background;
+  const bgRgb = hexToRgb2(bg);
+  if (!bgRgb) return null;
+
+  const luminances = colors.map((color) => {
+    const rgb = hexToRgb2(color);
+    if (!rgb) return null;
+
+    const luminance = 0.2126 * rgb.r + 0.7152 * rgb.g + 0.0722 * rgb.b;
+    return { color, luminance };
+  });
+
+  const sortedLuminances = luminances
+    .filter((l) => l !== null)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    .sort((a, b) => b!.luminance - a!.luminance);
+
+  const bestColor = sortedLuminances[0]?.color ?? null;
+  return bestColor;
+}
+
+export function hexToRgb2(
+  hex: string
+): { r: number; g: number; b: number } | null {
+  const match = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
+
+  if (match) {
+    return {
+      r: parseInt(String(match[1]), 16),
+      g: parseInt(String(match[2]), 16),
+      b: parseInt(String(match[3]), 16),
+    };
+  } else {
+    return null;
+  }
 }
 
 export function calculateContrastRatio(color1: string, color2: string) {

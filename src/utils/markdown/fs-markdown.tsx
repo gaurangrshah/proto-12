@@ -17,7 +17,11 @@ import path from 'path';
 
  * */
 
-import { ROUTES } from '../routes';
+export const ROUTES = {
+  POLICIES: 'legal',
+  DATA: 'content',
+  META: 'seo',
+};
 
 export function getMarkdownFiles(
   dir = `${ROUTES.DATA}/${ROUTES.POLICIES}`

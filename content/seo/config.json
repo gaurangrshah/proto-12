@@ -1,9 +1,9 @@
 {
-  "title": "Swatchr",
-  "url": "https://swatchr.app",
+  "title": "proto",
+  "url": "https://proto.gshah.dev",
   "description": "This is the description for this #bada55 project.",
   "keywords": "Doing all the dope things of course",
-  "twitterHandle": "@SwatchrApp",
+  "twitterHandle": "@Soham_Asmi",
   "locale": "en_US",
   "images": [
     {
@@ -22,10 +22,6 @@
     {
       "rel": "banner",
       "href": "https://cdn.jsdelivr.net/gh/swatchr/app@main/public/swatchr-full.png"
-    },
-    {
-      "rel": "canonical",
-      "href": "https://swatchr.app"
     }
   ]
 }
