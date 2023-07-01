@@ -19,7 +19,7 @@ const config = {
     defaultLocale: 'en',
   },
   images: {
-    domains: ['cdn.jsdelivr.net'],
+    domains: ['cdn.jsdelivr.net', 'images.unsplash.com', 's3.amazonaws.com'],
   },
   webpack: (config, { isServer }) => {
     if (!isServer) {
